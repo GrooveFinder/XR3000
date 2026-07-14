@@ -1,0 +1,2202 @@
+# Getting the XR-3000 working and bookmarkable
+
+## Why it hasn't been working
+
+You've been opening the deck by **double-clicking the file**. When you do that, your
+browser's address bar says `file:///...`
+
+In that mode:
+
+- **YouTube refuses to play.** That's the "Error 153" you saw. Google blocks video
+  embedding from local files, deliberately. Nothing you do in the deck can fix it.
+- **Nothing saves.** The browser blocks storage on local files, so your Tape Library
+  is wiped every time.
+
+This is not something you were doing wrong. It's a wall the browser puts up, and the
+only way past it is to open the deck over `http://` or `https://` instead.
+
+Once you've done the steps below, **both problems disappear permanently.**
+
+---
+
+## Putting it on GitHub Pages (free, permanent, bookmarkable)
+
+You'll end up with a real web address like:
+
+    https://yourname.github.io/xr3000/
+
+You bookmark that, and from then on you just click the bookmark. It works on your
+phone too.
+
+### Step 1 — Make a GitHub account
+
+Go to **github.com** and sign up, if you haven't already. It's free.
+
+### Step 2 — Make a new repository
+
+1. Click the **+** in the top-right, then **New repository**.
+2. Name it: `xr3000`
+3. Set it to **Public**. (Pages doesn't work on free private repos.)
+4. Tick **Add a README file**.
+5. Click **Create repository**.
+
+### Step 3 — Upload the deck
+
+1. On your new repo page, click **Add file** -> **Upload files**.
+2. Drag in **`index.html`** (the file that came with this guide).
+
+   The name matters. `index.html` is the name a web server looks for
+   automatically, which is what gives you a clean URL.
+
+3. Scroll down, click **Commit changes**.
+
+### Step 4 — Turn on Pages
+
+1. Click the **Settings** tab (top of the repo).
+2. In the left sidebar, click **Pages**.
+3. Under "Build and deployment":
+   - **Source**: Deploy from a branch
+   - **Branch**: `main`, folder `/ (root)`
+4. Click **Save**.
+
+### Step 5 — Wait a minute, then open it
+
+Refresh the Settings -> Pages screen after a minute. It'll show:
+
+    Your site is live at https://yourname.github.io/xr3000/
+
+Click it. The deck loads. **Bookmark that page.**
+
+---
+
+## How you know it worked
+
+- The red "opened from your hard drive" warning is **gone**.
+- Paste a YouTube link, press LOAD, and it **actually plays**.
+- Your Tape Library **survives a refresh**.
+
+---
+
+## Using it, once it's live
+
+### Playing something
+
+1. Paste a YouTube link into the loader box. A **playlist or album link works best**.
+2. Press **LOAD**. The tape spins up and plays.
+
+### Saving a tape to your library
+
+The Tape Library at the bottom **is** your favourites. To put something in it:
+
+1. Load and play a YouTube link (as above).
+2. Press **RECORD** — it lights up red (armed).
+3. Press **PLAY** — the tape rolls and starts logging tracks as they pass the heads.
+4. Press **STOP** when you've had enough — it asks you to name the tape.
+5. It appears as a card in **TAPE LIBRARY**. Click that card any time to load it back.
+
+Recorded tapes are saved in your browser, tied to that web address. Because it's now
+a proper URL, they'll still be there tomorrow.
+
+### The BLANK C60 button
+
+Ignore it for this. A blank is an empty cassette with nothing recorded on it — it's
+only there so you can watch the mechanism run without loading any music. It plays no
+part in saving your favourites.
+
+---
+
+## Keyboard shortcuts
+
+| Key | Does |
+|-----|------|
+| Space | Play / Pause |
+| Left / Right arrow | Rewind / Fast forward |
+| Shift + Left / Right | Previous / Next track |
+| Up / Down arrow | Output level |
+| S | Stop |
+| R | Record |
+| E | Eject |
+| P | Power |
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANO-DIGI XR-3000 · Stereo Cassette Deck</title>
+<meta name="description" content="A stereo cassette deck that plays YouTube. The reels turn, the tape winds spool to spool, and you can record what plays to a tape library.">
+<meta name="theme-color" content="#020203">
+<meta property="og:title" content="ANO-DIGI XR-3000">
+<meta property="og:description" content="A stereo cassette deck that plays YouTube.">
+<meta property="og:type" content="website">
+<!-- Cassette favicon, drawn inline so there's no second file to go missing.
+     Shows as the bookmark icon once the deck is on Pages. -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='9' fill='%23050506'/%3E%3Crect x='7' y='15' width='50' height='34' rx='4' fill='%23c9ced6' stroke='%23e8ecf1'/%3E%3Crect x='12' y='21' width='40' height='16' rx='2' fill='%230a0b0d'/%3E%3Ccircle cx='23' cy='29' r='6' fill='%23e8ecf1'/%3E%3Ccircle cx='23' cy='29' r='2.4' fill='%230a0b0d'/%3E%3Ccircle cx='41' cy='29' r='6' fill='%23e8ecf1'/%3E%3Ccircle cx='41' cy='29' r='2.4' fill='%230a0b0d'/%3E%3Crect x='15' y='41' width='34' height='5' rx='1.5' fill='%236e747d'/%3E%3Ccircle cx='32' cy='29' r='2' fill='%233af2ff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --face:#020203; --face-hi:#050506; --trim:#010102;
+    --champagne:#d8c495; --champagne-dim:#93856177;
+    --champagne-mute:#93856199;
+    --gold-line:#4a4028;
+    --fl-blue:#3af2ff; --fl-green:#2bffc4; --fl-amber:#ffc257; --fl-red:#ff5a4e;
+    --glow-blue:rgba(0,238,255,1); --glow-green:rgba(0,255,190,.95);
+    --glass-deep:#0c3a72; --glass-mid:#05121f; --glass-glow:rgba(40,170,255,.72);
+    --prism:linear-gradient(115deg,#ffd9f0 0%,#bfe6ff 22%,#fff6c8 45%,#c9ffe6 68%,#e2d4ff 88%,#ffd9f0 100%);
+    --chrome-face:linear-gradient(180deg,#191816 0%,#0c0b09 26%,#151412 42%,#080706 62%,#111010 82%,#040404 100%);
+    --scale-dim:#8fdcff; --hairline:#12456e; --seg-off:#0a1e30;
+  }
+  /* NEON: keep the colour and the lit core, but the bloom stays TIGHT. Wide
+     outer layers wash back over the letterforms and eat the type — the glow
+     should sit just off the edge of the glyph, not spread across it. */
+  .neon,.switch .cap,.slider-group .cap,.rack-title,.door .door-text,
+  .scale,.info-row .k,.naac,.status,.bar-row .ch,.brand .sub,.drawer-hide{
+    color:color-mix(in srgb, var(--fl-blue) 82%, #fff);   /* lit, but still coloured */
+    text-shadow:
+      0 0 1px color-mix(in srgb, var(--fl-blue) 90%, #fff),
+      0 0 3px var(--glow-blue),
+      0 0 8px color-mix(in srgb, var(--glow-blue) 60%, transparent);
+  }
+  /* ---- selectable FL display colours ---- */
+  body[data-disp="red"]{
+    --fl-blue:#ff2d18; --fl-green:#ff7a5c; --glow-blue:rgba(255,30,10,1); --glow-green:rgba(255,100,60,.95);
+    --glass-deep:#8c1208; --glass-mid:#2a0704; --glass-glow:rgba(255,45,20,.85);
+    --scale-dim:#ff9d8c; --hairline:#7a1a0e; --seg-off:#360f0a;}
+  body[data-disp="orange"]{
+    --fl-blue:#ff8c00; --fl-green:#ffbe2e; --glow-blue:rgba(255,138,0,1); --glow-green:rgba(255,190,45,.95);
+    --glass-deep:#8a5104; --glass-mid:#2a1802; --glass-glow:rgba(255,140,10,.85);
+    --scale-dim:#ffc873; --hairline:#7a4a08; --seg-off:#361f05;}
+  body[data-disp="green"]{
+    --fl-blue:#00ff9b; --fl-green:#7bffca; --glow-blue:rgba(0,255,150,1); --glow-green:rgba(130,255,205,.95);
+    --glass-deep:#067a50; --glass-mid:#02291a; --glass-glow:rgba(0,255,155,.85);
+    --scale-dim:#7dffc9; --hairline:#0a6b4a; --seg-off:#063324;}
+  body[data-disp="purple"]{
+    --fl-blue:#a929ff; --fl-green:#da6bff; --glow-blue:rgba(165,20,255,1); --glow-green:rgba(215,105,255,.95);
+    --glass-deep:#520c9e; --glass-mid:#1b052f; --glass-glow:rgba(160,25,255,.85);
+    --scale-dim:#d79bff; --hairline:#521a8a; --seg-off:#241038;}
+  @media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(ellipse 1100px 460px at 50% -12%, #14151a 0%, transparent 62%),
+      linear-gradient(180deg,#050507 0%,#030304 60%,#000 100%);
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    font-family:"Share Tech Mono","Courier New",monospace;padding:28px 12px;
+  }
+  .deck{
+    width:min(1060px,100%);
+    background:linear-gradient(180deg,#0e0d0c 0%,#040404 2.5%,var(--face) 5%,var(--face) 95%,#000 97%,#000 100%);
+    border-radius:12px;border:1px solid transparent;
+    box-shadow:0 40px 80px rgba(0,0,0,.85), 0 4px 14px rgba(0,0,0,.6),
+      inset 0 1px 0 rgba(255,255,255,.14), inset 0 -2px 0 rgba(0,0,0,.9),
+      0 0 30px -6px color-mix(in srgb, var(--glow-blue) 45%, transparent);
+    padding:16px 26px 22px;position:relative;
+  }
+  .deck::before{content:"";position:absolute;inset:-2px;border-radius:14px;z-index:0;pointer-events:none;
+    background:var(--prism);opacity:.20;filter:blur(.6px);}
+  .deck::after{content:"";position:absolute;inset:0;border-radius:12px;pointer-events:none;z-index:1;
+    background:
+      repeating-linear-gradient(90deg,rgba(255,255,255,.022) 0 1px,transparent 1px 2px,rgba(0,0,0,.02) 2px 3px),
+      linear-gradient(100deg,transparent 40%,rgba(255,255,255,.006) 47%,transparent 54%);}
+  .deck>*{position:relative;z-index:2;}
+  .panel{background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.010) 0 1px,transparent 1px 3px),
+    linear-gradient(180deg,#040405,#010102);}
+  /* continuous LED light strips framing the faceplate */
+  .strip{position:absolute;z-index:6;pointer-events:none;border-radius:2px;
+    background:linear-gradient(var(--sd,90deg),
+      transparent 0%,
+      color-mix(in srgb, var(--fl-blue) 85%, #fff) 8%,
+      color-mix(in srgb, var(--fl-blue) 95%, #fff) 50%,
+      color-mix(in srgb, var(--fl-blue) 85%, #fff) 92%,
+      transparent 100%);
+    box-shadow:0 0 10px var(--glow-blue), 0 0 22px color-mix(in srgb, var(--glow-blue) 55%, transparent);
+    transition:opacity .5s ease;}
+  .strip.top{left:30px;right:30px;top:7px;height:2px;--sd:90deg;}
+  .strip.bottom{left:30px;right:30px;bottom:7px;height:2px;--sd:90deg;}
+  .strip.left{top:30px;bottom:30px;left:7px;width:2px;--sd:180deg;}
+  .strip.right{top:30px;bottom:30px;right:7px;width:2px;--sd:180deg;}
+  body:not(.powered) .strip{opacity:.06;box-shadow:none;}
+  /* circular power switch, centred in the header's top-left slot */
+  .pwr{position:absolute;top:16px;left:26px;width:150px;height:88px;z-index:10;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+    background:none;border:none;padding:0;
+    font-family:Orbitron,sans-serif;font-size:8.5px;letter-spacing:.24em;text-indent:.24em;font-weight:700;
+    color:var(--scale-dim);text-align:center;transition:color .3s;}
+  .pwr .pwr-ring{width:38px;height:38px;border-radius:50%;position:relative;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--chrome-face);
+    border:1px solid #3a372f;
+    box-shadow:0 3px 8px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.28),
+      inset 0 -2px 3px rgba(0,0,0,.6), 0 0 0 3px #0a0906, 0 0 0 4px #2b2718;
+    transition:border-color .3s, box-shadow .3s, transform .05s;}
+  .pwr .pwr-ring::after{content:"";position:absolute;inset:2px;border-radius:50%;pointer-events:none;
+    background:linear-gradient(115deg,transparent 32%,rgba(255,255,255,.14) 46%,transparent 60%);}
+  .pwr .pwr-ring::before{content:"";position:absolute;inset:-1px;border-radius:50%;pointer-events:none;
+    background:conic-gradient(from 210deg,transparent 0 72%,rgba(255,246,200,.5) 80%,rgba(191,230,255,.5) 88%,transparent 96%);
+    -webkit-mask:radial-gradient(circle,transparent 62%,#000 64%);mask:radial-gradient(circle,transparent 62%,#000 64%);opacity:.6;}
+  .pwr svg{width:15px;height:15px;display:block;stroke:var(--scale-dim);opacity:.75;transition:stroke .3s, opacity .3s, filter .3s;}
+  .pwr:active .pwr-ring{transform:translateY(1px);
+    box-shadow:0 1px 3px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.15),
+      inset 0 2px 4px rgba(0,0,0,.5), 0 0 0 3px #0a0906, 0 0 0 4px #2b2718;}
+  body.powered .pwr{color:var(--fl-blue);text-shadow:0 0 5px var(--glow-blue);}
+  body.powered .pwr .pwr-ring{border-color:color-mix(in srgb, var(--fl-blue) 50%, #222);
+    box-shadow:0 3px 8px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.28),
+      inset 0 -2px 3px rgba(0,0,0,.6), 0 0 0 3px #0a0906, 0 0 0 4px #2b2718,
+      0 0 14px var(--glow-blue), inset 0 0 8px color-mix(in srgb, var(--glow-blue) 35%, transparent);}
+  body.powered .pwr svg{stroke:var(--fl-blue);opacity:1;filter:drop-shadow(0 0 4px var(--glow-blue));}
+  /* cold state: displays dark until power-up */
+  .fl-panel,.info-panel,.monitor{transition:filter .6s ease, opacity .6s ease;}
+  body:not(.powered) .fl-panel{filter:brightness(.15) saturate(.2);}
+  body:not(.powered) .info-panel{filter:brightness(.15) saturate(.2);}
+  body:not(.powered) .monitor{filter:brightness(.3);}
+  body:not(.powered) .tbtn{color:#3a3831;text-shadow:none;}
+  body:not(.powered) .tbtn small{opacity:.4;}
+  body.boot .fl-panel{transition-delay:.15s;}
+  body.boot .info-panel{transition-delay:.55s;}
+  body.boot .monitor{transition-delay:.95s;}
+  /* Full screen: an etched service marking on the faceplate, not a button.
+     It sits quiet until you go looking for it, then lights on hover. */
+  .fs-tab{position:absolute;top:9px;right:34px;z-index:10;cursor:pointer;
+    font-family:Orbitron,sans-serif;font-size:7.5px;letter-spacing:.22em;font-weight:700;
+    color:var(--champagne-dim);background:none;border:none;padding:3px 2px;
+    opacity:.35;text-shadow:none;
+    transition:opacity .25s, color .25s, text-shadow .25s;}
+  .fs-tab:hover{opacity:1;color:var(--fl-blue);
+    text-shadow:0 0 6px color-mix(in srgb, var(--glow-blue) 55%, transparent);}
+  .fs-tab:focus-visible{opacity:1;color:var(--fl-blue);outline:1px solid var(--fl-blue);outline-offset:2px;}
+  .brand{display:flex;justify-content:space-between;align-items:baseline;padding:12px 10px 14px 150px;flex-wrap:wrap;gap:8px;
+    border-bottom:2px solid transparent;border-image:var(--prism) 1;
+    box-shadow:0 8px 16px -10px var(--glow-blue);margin-bottom:14px;}
+  .brand .maker{font-family:Orbitron,sans-serif;font-weight:900;font-size:24px;letter-spacing:.34em;
+    background:linear-gradient(180deg,#ffffff 0%,#e8edf5 18%,#9aa2ad 44%,#f4f8fc 54%,#7f868f 72%,#dfe5ee 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 1px 0 rgba(0,0,0,.9)) drop-shadow(0 0 7px color-mix(in srgb, var(--glow-blue) 55%, transparent));
+    position:relative;}
+  .brand .dragon{font-family:Orbitron,sans-serif;font-style:normal;font-weight:900;letter-spacing:.12em;
+    color:var(--fl-blue);font-size:24px;text-shadow:0 1px 0 #000, 0 0 8px var(--glow-blue);}
+  .brand .sub{font-size:9.5px;letter-spacing:.3em;}
+  .panel{background:linear-gradient(180deg,var(--face-hi),var(--trim));border-radius:8px;
+    border:1px solid #2c2820;box-shadow:inset 0 2px 12px rgba(0,0,0,.85), inset 0 -1px 0 rgba(255,244,214,.05);
+    padding:18px;color:#cfc9bb;}
+  .row{display:flex;gap:18px;flex-wrap:wrap;}
+
+  /* ================= Reel-to-reel cassette ================= */
+  .bay{flex:1 1 430px;min-width:330px;background:#030304;border-radius:7px;
+    border:1px solid #33302a;
+    box-shadow:inset 0 0 40px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,244,214,.06);
+    padding:20px;position:relative;overflow:visible;
+    display:flex;align-items:center;justify-content:center;perspective:900px;}
+  /* ---------- illuminated cassette compartment ----------
+     A real deck lit the bay from behind so the shell glowed from within. The
+     lamp sits under the cassette, washing colour up through it, and the bay
+     walls pick it up. It breathes while the tape is running. */
+  .bay-lamp{position:absolute;inset:0;z-index:0;pointer-events:none;border-radius:7px;
+    opacity:0;transition:opacity .7s ease;
+    background:
+      /* hot core behind the shell */
+      radial-gradient(ellipse 62% 46% at 50% 62%,
+        color-mix(in srgb, var(--fl-blue) 42%, transparent) 0%,
+        color-mix(in srgb, var(--glow-blue) 24%, transparent) 38%,
+        transparent 74%),
+      /* light spilling up off the compartment floor */
+      radial-gradient(ellipse 90% 34% at 50% 104%,
+        color-mix(in srgb, var(--fl-blue) 58%, #fff) 0%,
+        color-mix(in srgb, var(--glow-blue) 30%, transparent) 26%,
+        transparent 68%),
+      /* the walls catching it */
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--glow-blue) 16%, transparent) 0%,
+        transparent 34%,
+        color-mix(in srgb, var(--glow-blue) 22%, transparent) 100%);
+    filter:blur(2px);}
+  body.powered .bay-lamp{opacity:1;}
+  body.powered.running .bay-lamp{animation:bayBreathe 3.4s ease-in-out infinite;}
+  @keyframes bayBreathe{50%{opacity:.78}}
+  /* the bay itself glows once lit, so the compartment reads as a light box */
+  body.powered .bay{
+    border-color:color-mix(in srgb, var(--fl-blue) 34%, #33302a);
+    box-shadow:inset 0 0 40px rgba(0,0,0,.75),
+      inset 0 0 26px color-mix(in srgb, var(--glow-blue) 30%, transparent),
+      inset 0 1px 0 rgba(255,244,214,.06),
+      0 0 16px color-mix(in srgb, var(--glow-blue) 26%, transparent);}
+  .bay{transition:box-shadow .7s ease, border-color .7s ease;}
+  /* the shell sits in the light, so its edges pick up the colour */
+  body.powered .cassette{
+    box-shadow:
+      0 18px 34px rgba(0,0,0,.85), 0 6px 12px rgba(0,0,0,.6),
+      inset 0 2px 0 rgba(255,255,255,.35),
+      inset 0 -3px 6px rgba(0,0,0,.55),
+      inset 6px 0 12px -6px rgba(0,0,0,.5),
+      inset -6px 0 12px -6px rgba(0,0,0,.5),
+      inset 0 0 30px rgba(0,0,0,.30),
+      0 0 22px -2px color-mix(in srgb, var(--glow-blue) 45%, transparent);}
+  /* ---------- glass loading door ---------- */
+  .door{position:absolute;inset:6px;z-index:6;border-radius:6px;
+    transform-origin:50% 100%;transform-style:preserve-3d;
+    transition:transform .7s cubic-bezier(.5,-0.2,.3,1.15);
+    background:linear-gradient(160deg,rgba(190,215,240,.20) 0%,rgba(120,140,165,.10) 30%,rgba(15,18,24,.26) 60%,rgba(190,215,240,.14) 100%);
+    border:2.5px solid rgba(205,220,240,.38);
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.4), inset 0 0 0 5px rgba(160,185,215,.10),
+      inset 0 0 0 6px rgba(10,14,20,.35), inset 0 -16px 28px rgba(0,0,0,.4),
+      0 3px 14px rgba(0,0,0,.55);
+    pointer-events:none;}
+  .door::before{ /* diagonal glare */
+    content:"";position:absolute;inset:0;border-radius:6px;
+    background:linear-gradient(115deg,transparent 18%,rgba(235,245,255,.22) 26%,rgba(235,245,255,.05) 34%,transparent 44%,transparent 68%,rgba(235,245,255,.10) 76%,transparent 84%);}
+  .door::after{ /* bottom metal sill + finger recess */
+    content:"";position:absolute;left:0;right:0;bottom:0;height:14%;border-radius:0 0 6px 6px;
+    background:var(--chrome-face);
+    border-top:2px solid transparent;
+    border-image:var(--prism) 1;
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.25), inset 0 -3px 6px rgba(0,0,0,.7);}
+  .door .door-text{position:absolute;left:50%;bottom:3.2%;transform:translateX(-50%);z-index:1;
+    font-size:13px;letter-spacing:.42em;font-family:Orbitron,sans-serif;font-weight:700;
+    color:color-mix(in srgb, var(--fl-blue) 70%, #fff);   /* tube core */
+    text-shadow:0 0 1px #fff,
+      0 0 4px var(--glow-blue),
+      0 0 12px color-mix(in srgb, var(--glow-blue) 60%, transparent);
+    white-space:nowrap;}
+  .door .door-hinge{position:absolute;bottom:-2px;width:26px;height:5px;border-radius:2px;
+    background:linear-gradient(180deg,#4c463a,#181510);}
+  .door .door-hinge.h1{left:12%}.door .door-hinge.h2{right:12%}
+  .bay.open .door{transform:rotateX(-68deg);}
+  .bay.open .cassette{transform:translateY(-9%);
+    box-shadow:0 20px 34px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.18),
+      0 0 16px -4px color-mix(in srgb, var(--glow-blue) 30%, transparent);}
+  .cassette{transition:transform .8s cubic-bezier(.6,-0.3,.4,1.3), box-shadow .6s;}
+  .bay::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;
+    background:linear-gradient(112deg,rgba(160,210,255,.10) 0%,rgba(160,210,255,.03) 22%,transparent 42%);}
+  .bay::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse at 50% 135%,rgba(20,55,105,.45) 0%,transparent 65%);}
+  .cassette{
+    width:100%;max-width:430px;aspect-ratio:100.4/63.8;
+    background:
+      linear-gradient(118deg,transparent 26%,rgba(255,255,255,.16) 33%,rgba(255,255,255,.03) 39%,transparent 47%),
+      linear-gradient(155deg,rgba(255,255,255,.20) 0%,rgba(215,225,240,.07) 30%,rgba(255,255,255,.13) 55%,rgba(190,200,215,.05) 100%),
+      linear-gradient(180deg,rgba(24,26,32,.30),rgba(8,9,12,.46));
+    border-radius:9px;position:relative;
+    border:9px solid transparent;
+    background-clip:padding-box;
+    box-shadow:
+      0 18px 34px rgba(0,0,0,.85), 0 6px 12px rgba(0,0,0,.6),
+      inset 0 2px 0 rgba(255,255,255,.35),
+      inset 0 -3px 6px rgba(0,0,0,.55),
+      inset 6px 0 12px -6px rgba(0,0,0,.5),
+      inset -6px 0 12px -6px rgba(0,0,0,.5),
+      inset 0 0 30px rgba(0,0,0,.30);
+    transition:transform .8s cubic-bezier(.6,-0.3,.4,1.3), box-shadow .6s;
+  }
+  .cassette::before{ /* chrome shell wall */
+    content:"";position:absolute;inset:-9px;border-radius:9px;z-index:-1;
+    background:linear-gradient(150deg,#fafbfd 0%,#c9ced6 16%,#82878f 38%,#e8ecf1 56%,#9aa0a9 76%,#f2f4f7 100%);
+    box-shadow:0 2px 6px rgba(0,0,0,.6), inset 0 1px 1px rgba(255,255,255,.85), inset 0 -2px 4px rgba(20,25,35,.6);
+  }
+  .cassette.flipping{transform:rotateY(90deg) scale(.96);}
+  /* moulded inner window: the recessed area the reels sit in */
+  .cassette .moulding{position:absolute;left:5%;right:5%;top:9%;bottom:26%;z-index:1;
+    border-radius:5px;pointer-events:none;
+    border:1px solid rgba(225,235,248,.18);
+    box-shadow:
+      inset 0 4px 10px rgba(0,0,0,.5),
+      inset 0 -2px 0 rgba(255,255,255,.18),
+      inset 3px 0 7px -3px rgba(0,0,0,.45),
+      inset -3px 0 7px -3px rgba(0,0,0,.45),
+      0 1px 0 rgba(255,255,255,.14);}
+  /* lower deck: the ribbed plastic strip under the reels */
+  .cassette .rib-deck{position:absolute;left:5%;right:5%;bottom:6%;height:17%;z-index:1;
+    border-radius:3px;pointer-events:none;
+    background:
+      repeating-linear-gradient(90deg,rgba(255,255,255,.10) 0 1.5px,transparent 1.5px 6px),
+      linear-gradient(180deg,rgba(235,242,252,.13),rgba(15,17,22,.30));
+    border-top:1px solid rgba(230,240,252,.20);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.25), inset 0 -2px 4px rgba(0,0,0,.4);}
+  .cassette .screw{position:absolute;width:12px;height:12px;border-radius:50%;z-index:5;
+    background:
+      radial-gradient(circle at 50% 50%, #0a0b0d 0 26%, transparent 27%),
+      linear-gradient(90deg,transparent 44%,#0a0b0d 44% 56%,transparent 56%),
+      radial-gradient(circle at 38% 32%, #eef1f5 0%, #b9bfc7 30%, #767c85 62%, #43474e 100%);
+    box-shadow:
+      inset 0 2px 3px rgba(0,0,0,.75),
+      inset 0 -1px 1px rgba(255,255,255,.5),
+      0 1px 0 rgba(255,255,255,.35);
+    border:1px solid rgba(20,24,30,.75);}
+  .screw.s1{left:1.8%;top:5%}.screw.s2{right:1.8%;top:5%}
+  .screw.s3{left:1.8%;bottom:7%}.screw.s4{right:1.8%;bottom:7%}.screw.s5{left:calc(50% - 6px);bottom:7%}
+  /* clear-shell reels visible edge to edge */
+  .reelSvg{position:absolute;inset:0;width:100%;height:100%;z-index:1;
+    filter:drop-shadow(0 4px 6px rgba(0,0,0,.55));}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .reel-rot{transform-origin:center;transform-box:fill-box;}
+  .playing .reel-rot{animation:spin var(--spin,2.4s) linear infinite;animation-direction:reverse;}
+  .playing.ff .reel-rot{animation-duration:var(--spin,.5s);}
+  .playing.rw .reel-rot{animation-duration:var(--spin,.5s);animation-direction:normal;}
+  .sideB.playing .reel-rot{animation-direction:normal;}
+  .sideB.playing.rw .reel-rot{animation-direction:reverse;}
+  /* slim label band across the top */
+  .band{position:absolute;left:6%;right:6%;top:6%;height:16%;z-index:2;
+    background:linear-gradient(180deg,#f4f1e8,#ddd7c6);border-radius:4px;
+    display:flex;align-items:center;justify-content:space-between;padding:0 4%;
+    box-shadow:0 2px 6px rgba(0,0,0,.5), inset 0 -1px 2px rgba(0,0,0,.25);}
+  .tdk-logo{color:#d0021b;font-weight:900;font-size:clamp(12px,3vw,17px);font-family:Arial,sans-serif;letter-spacing:.04em;}
+  .max-badge{font-weight:900;font-style:italic;font-size:clamp(11px,2.6vw,15px);color:#15130f;}
+  .max-badge b{color:#d0021b;}
+  .band .tiny{font-size:clamp(6px,1.3vw,7.5px);letter-spacing:.14em;color:#5c564a;}
+  .song-band{position:absolute;left:6%;right:6%;bottom:19%;z-index:2;text-align:center;
+    font-family:"Courier New",monospace;font-size:clamp(7px,1.8vw,10.5px);color:#cfc9bb;
+    text-shadow:0 1px 2px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .side-mark{position:absolute;left:4%;bottom:5%;z-index:2;font-weight:900;
+    color:var(--champagne);font-size:clamp(11px,2.8vw,15px);text-shadow:0 1px 2px #000;}
+  .metal-mark{position:absolute;right:4%;bottom:6%;z-index:2;font-size:clamp(6px,1.3vw,7.5px);
+    letter-spacing:.12em;color:var(--champagne-mute);}
+
+  /* ================= Right column ================= */
+  .right-col{flex:1 1 400px;min-width:310px;display:flex;flex-direction:column;gap:12px;}
+  .glass{background:
+      radial-gradient(ellipse at 50% 150%,var(--glass-deep) 0%,var(--glass-mid) 55%,#04070e 100%);
+    border:1px solid color-mix(in srgb, var(--fl-blue) 45%, #15161a);border-radius:4px;
+    clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+    box-shadow:inset 0 0 26px var(--glass-glow), inset 0 2px 8px rgba(0,0,0,.85),
+      inset 0 1px 0 rgba(255,255,255,.25), inset 0 0 0 1px rgba(255,255,255,.06),
+      0 0 14px color-mix(in srgb, var(--glow-blue) 45%, transparent);position:relative;overflow:hidden;}
+  .glass::after{content:"";position:absolute;left:0;right:0;top:0;height:2px;pointer-events:none;
+    background:var(--prism);opacity:.55;}
+  .glass::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      repeating-linear-gradient(180deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px),
+      linear-gradient(105deg,rgba(190,225,255,.08) 0%,transparent 35%);}
+  .fl-panel{padding:12px 16px 8px;}
+  .scale{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.08em;padding:0 2px 5px 34px;}
+  .scale .red{color:#ff8a7e;}
+  .bar-row{display:flex;align-items:center;gap:9px;margin-bottom:7px;}
+  .bar-row .ch{width:25px;font-size:9.5px;letter-spacing:.2em;}
+  .bar{flex:1;display:flex;gap:2px;height:13px;}
+  .seg{flex:1;border-radius:1px;background:#0a0b0d;border:1px solid rgba(255,255,255,.04);box-shadow:inset 0 1px 1px rgba(0,0,0,.7);}
+  .seg.on{background:color-mix(in srgb, var(--fl-blue) 80%, #fff);
+    box-shadow:0 0 4px var(--glow-blue), 0 0 9px color-mix(in srgb, var(--glow-blue) 55%, transparent);
+    border-color:transparent;}
+  .seg.on.mid{background:#ffd98a;box-shadow:0 0 4px rgba(255,194,87,.9), 0 0 9px rgba(255,194,87,.5);}
+  .seg.on.hot{background:#ff8a7e;box-shadow:0 0 5px rgba(255,90,78,.9), 0 0 11px rgba(255,90,78,.5);}
+  .seg.peak{background:var(--fl-amber)!important;box-shadow:0 0 8px rgba(255,194,87,.8)!important;}
+  .info-panel{padding:12px 16px;font-family:"Share Tech Mono",monospace;}
+  .info-row{display:flex;gap:10px;align-items:baseline;margin:3.5px 0;min-height:15px;}
+  .info-row .k{font-size:9px;letter-spacing:.24em;width:66px;flex:none;font-family:Helvetica,Arial,sans-serif;}
+  .info-row .v{font-size:12.5px;color:color-mix(in srgb, var(--fl-blue) 80%, #fff);
+    text-shadow:0 0 2px var(--glow-blue), 0 0 7px color-mix(in srgb, var(--glow-blue) 55%, transparent);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
+  .info-row .v.grn{color:color-mix(in srgb, var(--fl-green) 80%, #fff);
+    text-shadow:0 0 2px var(--glow-green), 0 0 7px color-mix(in srgb, var(--glow-green) 55%, transparent);}
+  /* A real counter's digits are all the same width — they're segments in fixed
+     cells. Orbitron's digits are proportional by default, so '1' is narrower
+     than '0' and the counter's width changed on every tick, shunting the
+     duration and the arrows sideways. tabular-nums locks the cells; fixed
+     tracks stop the row redistributing as the contents change. */
+  .info-foot{display:grid;
+    grid-template-columns:auto auto 1fr auto;
+    align-items:center;gap:14px;margin-top:8px;
+    border-top:1px solid var(--hairline);padding-top:8px;}
+  .digits{font-family:Orbitron,sans-serif;font-weight:700;font-size:18px;letter-spacing:.12em;
+    font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;
+    white-space:nowrap;
+    color:color-mix(in srgb, var(--fl-blue) 75%, #fff);
+    text-shadow:0 0 2px var(--glow-blue), 0 0 7px color-mix(in srgb, var(--glow-blue) 65%, transparent);}
+  /* Belt and braces: even if the webfont ships no tabular figures, a reserved
+     width means the counter's box can never resize as the digits change. */
+  #counter{min-width:6.4ch;display:inline-block;}
+  #duration{min-width:7.2ch;display:inline-block;}
+  .dir{display:flex;gap:9px;font-size:13px;justify-self:center;}
+  .dir span{color:var(--scale-dim);transition:.2s;}
+  .dir span.lit{color:color-mix(in srgb, var(--fl-green) 70%, #fff);
+    text-shadow:0 0 2px var(--glow-green), 0 0 8px color-mix(in srgb, var(--glow-green) 60%, transparent);}
+  .naac{font-size:9px;letter-spacing:.22em;font-family:Helvetica,Arial,sans-serif;}
+  .naac.lit{color:var(--fl-amber);text-shadow:0 0 9px rgba(255,194,87,.6);animation:naacPulse 1.6s ease-in-out 3;}
+  @keyframes naacPulse{50%{opacity:.35}}
+    50%{transform:translateX(-.3px)}75%{transform:translateX(.2px)}100%{transform:translateX(0)}}
+  .monitor{border:1px solid color-mix(in srgb, var(--fl-blue) 30%, #15161a);border-radius:4px;
+    clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+    overflow:hidden;background:#000;position:relative;
+    box-shadow:0 0 8px color-mix(in srgb, var(--glow-blue) 30%, transparent);}
+  .monitor .cap{position:absolute;top:5px;left:9px;z-index:2;font-size:9px;letter-spacing:.28em;color:var(--scale-dim);
+    background:rgba(0,0,0,.55);padding:2px 7px;border-radius:2px;pointer-events:none;}
+  .monitor .frame{aspect-ratio:16/9;width:100%;}
+  .monitor iframe{width:100%!important;height:100%!important;display:block;}
+  .monitor.min .frame{aspect-ratio:auto;height:42px;}
+  /* Expanded, the toggle sits over live video: a faint scrim keeps it legible
+     against bright footage without turning it back into a button. */
+  .monitor:not(.min) .mon-toggle{background:rgba(0,0,0,.45);opacity:.55;}
+  .monitor:not(.min) .mon-toggle:hover{background:rgba(0,0,0,.7);opacity:1;}
+  /* Video toggle: a quiet corner marking on the monitor glass, not a button box. */
+  .mon-toggle{position:absolute;top:5px;right:8px;z-index:2;font-size:7.5px;
+    background:none;border:none;padding:2px 3px;border-radius:2px;
+    color:var(--scale-dim);opacity:.4;cursor:pointer;letter-spacing:.22em;
+    font-family:Orbitron,sans-serif;font-weight:700;text-shadow:none;
+    transition:opacity .25s, color .25s, text-shadow .25s;}
+  .mon-toggle:hover{opacity:1;color:var(--fl-blue);
+    text-shadow:0 0 6px color-mix(in srgb, var(--glow-blue) 55%, transparent);}
+  .mon-toggle:focus-visible{opacity:1;color:var(--fl-blue);outline:1px solid var(--fl-blue);outline-offset:2px;}
+
+  /* ================= Controls ================= */
+  .controls{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;margin-top:18px;
+    padding-top:14px;border-top:1px solid var(--gold-line);}
+  .switch{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .switch .cap{font-size:8.5px;letter-spacing:.16em;text-align:center;line-height:1.5;font-family:Orbitron,sans-serif;}
+  .toggle{width:46px;height:21px;border-radius:3px;background:linear-gradient(180deg,#0b0a08,#191712);
+    border:1px solid #3d382e;cursor:pointer;position:relative;
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.85), 0 1px 0 rgba(255,244,214,.06);}
+  .toggle .knob{position:absolute;top:2px;left:2px;width:20px;height:15px;border-radius:2px;
+    background:linear-gradient(180deg,#ffffff 0%,#dfe5ee 22%,#9aa2ad 52%,#f2f6fb 62%,#878e99 100%);
+    transition:left .1s;box-shadow:0 1px 3px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.9);}
+  .toggle .knob::after{content:"";position:absolute;left:0;right:0;top:0;height:1.5px;
+    background:var(--prism);opacity:.7;}
+  .toggle.on .knob{left:22px;}
+  .lamp{width:6px;height:6px;border-radius:50%;background:#1c2f1c;}
+  .toggle.on + .lamp{background:color-mix(in srgb, var(--fl-green) 60%, #fff);
+    box-shadow:0 0 8px var(--glow-green), 0 0 18px var(--glow-green), 0 0 30px color-mix(in srgb, var(--glow-green) 60%, transparent);}
+  .disp-select{gap:8px;}
+  .disp-dots{display:flex;gap:7px;align-items:center;height:21px;padding:0 6px;border-radius:3px;
+    background:linear-gradient(180deg,#0b0a08,#191712);border:1px solid #3d382e;
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.85);}
+  .dot{width:11px;height:11px;border-radius:50%;border:1px solid rgba(0,0,0,.6);cursor:pointer;
+    background:radial-gradient(circle at 35% 30%, var(--c), color-mix(in srgb, var(--c) 35%, #000));
+    opacity:.4;transition:.15s;}
+  .dot:hover{opacity:.75;}
+  .dot.active{opacity:1;box-shadow:0 0 9px var(--c), inset 0 1px 1px rgba(255,255,255,.5);}
+  .slider-group{display:flex;flex-direction:column;align-items:center;gap:5px;}
+  /* Sliders: a lit track with a glowing thumb, not a flat accent swatch. */
+  .slider-group input{width:120px;accent-color:var(--fl-blue);
+    -webkit-appearance:none;appearance:none;height:4px;border-radius:3px;
+    background:linear-gradient(90deg,
+      color-mix(in srgb, var(--fl-blue) 85%, #fff),
+      var(--fl-blue));
+    box-shadow:0 0 10px color-mix(in srgb, var(--glow-blue) 65%, transparent),
+      inset 0 1px 2px rgba(0,0,0,.6);
+    outline:none;cursor:pointer;}
+  .slider-group input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:14px;height:14px;border-radius:50%;cursor:pointer;
+    background:radial-gradient(circle at 38% 32%, #fff 0%,
+      color-mix(in srgb, var(--fl-blue) 55%, #fff) 40%, var(--fl-blue) 100%);
+    border:1px solid color-mix(in srgb, var(--fl-blue) 90%, #fff);
+    box-shadow:0 0 8px var(--glow-blue), 0 0 18px color-mix(in srgb, var(--glow-blue) 70%, transparent);}
+  .slider-group input::-moz-range-thumb{
+    width:13px;height:13px;border-radius:50%;cursor:pointer;
+    background:radial-gradient(circle at 38% 32%, #fff 0%,
+      color-mix(in srgb, var(--fl-blue) 55%, #fff) 40%, var(--fl-blue) 100%);
+    border:1px solid color-mix(in srgb, var(--fl-blue) 90%, #fff);
+    box-shadow:0 0 8px var(--glow-blue), 0 0 18px color-mix(in srgb, var(--glow-blue) 70%, transparent);}
+  .slider-group input::-moz-range-track{height:4px;border-radius:3px;background:var(--fl-blue);}
+  .slider-group .cap{font-size:8.5px;letter-spacing:.16em;text-align:center;line-height:1.6;font-family:Orbitron,sans-serif;
+    font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;}
+  /* the live value under each slider: reserved width, so dragging from 100 to 5
+     doesn't make the caption jump about */
+  #pitchVal,#biasVal,#calVal,#outVal,#tapeVal{display:inline-block;min-width:4ch;}
+  .slider-group.output{margin-left:auto;}
+  .transport{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;}
+  .tbtn{flex:1 1 76px;min-width:64px;height:54px;border-radius:2px;cursor:pointer;
+    border:1px solid color-mix(in srgb, var(--fl-blue) 22%, #23211c);
+    clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+    background:var(--chrome-face);
+    box-shadow:0 5px 10px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.28),
+      inset 0 -2px 3px rgba(0,0,0,.6);
+    position:relative;overflow:hidden;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    padding:0;text-align:center;line-height:1;
+    color:color-mix(in srgb, var(--fl-blue) 80%, #fff);font-size:15px;
+    text-shadow:0 0 2px var(--glow-blue),
+      0 0 8px color-mix(in srgb, var(--glow-blue) 55%, transparent);
+    transition:transform .05s, box-shadow .05s, color .2s, border-color .2s;}
+  .tbtn::before{content:"";position:absolute;left:0;right:0;top:0;height:1.5px;
+    background:var(--prism);opacity:.6;}
+  .tbtn::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.10) 42%,transparent 52%);}
+  .tbtn small{font-size:8px;letter-spacing:.22em;text-indent:.22em;font-family:Orbitron,sans-serif;
+    color:color-mix(in srgb, var(--fl-blue) 82%, #fff);
+    text-align:center;line-height:1.2;
+    text-shadow:0 0 1px var(--glow-blue),
+      0 0 6px color-mix(in srgb, var(--glow-blue) 50%, transparent);}
+  .tbtn:hover{border-color:color-mix(in srgb, var(--fl-blue) 75%, #222);
+    box-shadow:0 5px 10px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.28),
+      inset 0 -2px 3px rgba(0,0,0,.6),
+      0 0 16px -2px color-mix(in srgb, var(--glow-blue) 55%, transparent);}
+  .tbtn:active{transform:translateY(2px);box-shadow:0 1px 3px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,244,214,.08);}
+  .tbtn.engaged{
+    box-shadow:inset 0 0 20px color-mix(in srgb, var(--glow-blue) 55%, transparent),
+      0 1px 2px rgba(0,0,0,.6),
+      0 0 22px -2px color-mix(in srgb, var(--glow-blue) 75%, transparent);
+    color:color-mix(in srgb, var(--fl-blue) 40%, #fff);
+    text-shadow:0 0 2px #fff,
+      0 0 6px var(--glow-blue),
+      0 0 14px color-mix(in srgb, var(--glow-blue) 65%, transparent);
+    transform:translateY(2px);
+    border-color:color-mix(in srgb, var(--fl-blue) 90%, #fff);}
+  .tbtn.engaged small{color:color-mix(in srgb, var(--fl-blue) 45%, #fff);
+    text-shadow:0 0 2px #fff, 0 0 7px var(--glow-blue);}
+  /* RECORD: the one red control on an otherwise cool-lit deck */
+  .tbtn.rec{color:#8a4a44;}
+  .tbtn.rec:hover{border-color:#b8564a;}
+  .tbtn.rec small{color:#9a5a52;text-shadow:none;}
+  .tbtn.rec.armed{color:#ff5a4e;text-shadow:0 0 8px rgba(255,90,78,.8);
+    border-color:#c0453a;animation:recBlink 1s steps(2,start) infinite;}
+  .tbtn.rec.armed small{color:#ff8a7e;text-shadow:0 0 5px rgba(255,90,78,.6);}
+  .tbtn.rec.rolling{color:#ff5a4e;text-shadow:0 0 10px rgba(255,90,78,.9);
+    border-color:#e0503f;box-shadow:inset 0 0 14px rgba(255,60,40,.35), 0 1px 2px rgba(0,0,0,.6);
+    transform:translateY(2px);}
+  .tbtn.rec.rolling small{color:#ff8a7e;text-shadow:0 0 5px rgba(255,90,78,.6);}
+  @keyframes recBlink{50%{opacity:.45}}
+  body.recording .digits{color:#ff5a4e;text-shadow:0 0 7px rgba(255,90,78,.8);}
+  /* tape type: I / II / IV, sets bias + EQ */
+  .tape-select{gap:8px;}
+  .tape-types{display:flex;gap:4px;align-items:center;height:21px;padding:0 4px;border-radius:3px;
+    background:linear-gradient(180deg,#0b0a08,#191712);border:1px solid #3d382e;
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.85);}
+  .ttype{min-width:20px;height:15px;padding:0 3px;border-radius:2px;cursor:pointer;
+    background:none;border:1px solid transparent;color:var(--scale-dim);opacity:.45;
+    font-family:Orbitron,sans-serif;font-size:8px;font-weight:700;letter-spacing:.04em;
+    transition:.15s;}
+  .ttype:hover{opacity:.8;}
+  .ttype.active{opacity:1;color:var(--fl-blue);border-color:color-mix(in srgb, var(--fl-blue) 45%, #222);
+    background:rgba(0,0,0,.5);text-shadow:0 0 5px var(--glow-blue);}
+  /* TAPE LIBRARY: recorded cassettes, saved locally */
+  .rack{margin-top:14px;padding-top:12px;border-top:1px solid var(--gold-line);}
+  .rack.hidden{display:none;}
+  .rack-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;}
+  .rack-title{font-family:Orbitron,sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.24em;}
+  .rack-count{font-size:8.5px;letter-spacing:.18em;color:color-mix(in srgb, var(--fl-blue) 55%, #7d7a70);
+    text-shadow:0 0 6px color-mix(in srgb, var(--glow-blue) 45%, transparent);}
+  .rack-shelf{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch;}
+  .rack-empty{font-size:9px;letter-spacing:.14em;padding:6px 0;
+    color:color-mix(in srgb, var(--fl-blue) 40%, #6f6c64);
+    text-shadow:0 0 5px color-mix(in srgb, var(--glow-blue) 30%, transparent);}
+  .tape-card{flex:0 1 190px;min-width:150px;position:relative;cursor:pointer;text-align:left;
+    border-radius:3px;padding:8px 26px 8px 10px;
+    background:linear-gradient(180deg,#141310 0%,#0a0908 55%,#050505 100%);
+    border:1px solid #33302a;
+    box-shadow:0 3px 7px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.10);
+    transition:border-color .2s, transform .05s;}
+  .tape-card::before{content:"";position:absolute;left:0;right:0;top:0;height:1.5px;
+    background:var(--prism);opacity:.45;}
+  .tape-card:hover{border-color:color-mix(in srgb, var(--fl-blue) 45%, #222);}
+  .tape-card:active{transform:translateY(1px);}
+  .tape-card .tc-name{display:block;font-family:"Share Tech Mono",monospace;font-size:11px;
+    color:color-mix(in srgb, var(--fl-blue) 80%, #fff);
+    text-shadow:0 0 2px var(--glow-blue), 0 0 7px color-mix(in srgb, var(--glow-blue) 50%, transparent);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tape-card .tc-meta{display:block;margin-top:3px;font-size:8px;letter-spacing:.14em;
+    color:var(--champagne-mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tc-eject{position:absolute;top:5px;right:5px;width:16px;height:16px;padding:0;line-height:1;
+    background:none;border:1px solid transparent;border-radius:2px;cursor:pointer;
+    color:var(--champagne-dim);font-size:11px;transition:.15s;}
+  .tc-eject:hover{color:var(--fl-red);border-color:rgba(255,90,78,.5);}
+  /* shown only when the deck is opened from file:// — the one thing that stops
+     it working, and the one thing a user can't diagnose from the symptoms */
+  .disk-warn{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:9999;
+    width:min(560px,92vw);display:flex;flex-direction:column;gap:8px;
+    background:linear-gradient(180deg,#2a1410,#160906);
+    border:1px solid #b8564a;border-radius:8px;padding:16px 18px;
+    box-shadow:0 18px 44px rgba(0,0,0,.8), 0 0 24px -6px rgba(255,90,78,.5);
+    font-family:"Share Tech Mono",monospace;color:#f0d8d2;font-size:12.5px;line-height:1.55;}
+  .disk-warn strong{font-family:Orbitron,sans-serif;font-size:11px;letter-spacing:.14em;
+    color:#ff8a7e;text-shadow:0 0 8px rgba(255,90,78,.6);}
+  .disk-warn code{background:rgba(0,0,0,.5);border:1px solid #5c2a24;border-radius:3px;
+    padding:1px 5px;color:#ffb0a4;}
+  .disk-warn button{align-self:flex-end;margin-top:2px;cursor:pointer;
+    background:none;border:1px solid #7a3a32;border-radius:4px;color:#ff9d8c;
+    font-family:Orbitron,sans-serif;font-size:9px;letter-spacing:.2em;padding:6px 14px;}
+  .disk-warn button:hover{border-color:#ff8a7e;color:#fff;}
+  .drawer{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;}
+  /* The loader is a lit element like the meters and the strips: it carries the
+     selected display colour, so changing the colour dots relights it too. */
+  .drawer input{flex:1 1 260px;background:#06090e;font-family:'Share Tech Mono',monospace;
+    border:1px solid color-mix(in srgb, var(--fl-blue) 40%, #15161a);border-radius:4px;
+    color:var(--fl-blue);text-shadow:0 0 5px var(--glow-blue);
+    padding:11px 13px;font-family:"Courier New",monospace;font-size:13px;outline:none;
+    transition:border-color .3s, box-shadow .3s;
+    box-shadow:inset 0 2px 7px rgba(0,0,0,.85),
+      inset 0 0 14px color-mix(in srgb, var(--glow-blue) 22%, transparent),
+      0 0 12px color-mix(in srgb, var(--glow-blue) 38%, transparent);}
+  .drawer input::placeholder{color:var(--scale-dim);opacity:.55;text-shadow:none;}
+  .drawer input:hover{border-color:color-mix(in srgb, var(--fl-blue) 60%, #15161a);}
+  .drawer input:focus{border-color:color-mix(in srgb, var(--fl-blue) 85%, #fff);
+    box-shadow:inset 0 2px 7px rgba(0,0,0,.85),
+      inset 0 0 18px color-mix(in srgb, var(--glow-blue) 32%, transparent),
+      0 0 20px color-mix(in srgb, var(--glow-blue) 62%, transparent);}
+  .drawer button{padding:11px 20px;border-radius:2px;border:1px solid color-mix(in srgb, var(--fl-blue) 35%, #222);cursor:pointer;font-size:10px;
+    letter-spacing:.26em;text-indent:.26em;text-align:center;background:var(--chrome-face);color:var(--fl-blue);font-weight:700;
+    font-family:Orbitron,sans-serif;text-shadow:0 0 5px var(--glow-blue);position:relative;
+    transition:border-color .3s, box-shadow .3s;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 3px 7px rgba(0,0,0,.55),
+      0 0 10px color-mix(in srgb, var(--glow-blue) 30%, transparent);}
+  .drawer button::after{content:"";position:absolute;left:0;right:0;top:0;height:1.5px;
+    background:var(--prism);opacity:.6;}
+  .drawer button:hover{border-color:color-mix(in srgb, var(--fl-blue) 65%, #222);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 3px 7px rgba(0,0,0,.55),
+      0 0 16px color-mix(in srgb, var(--glow-blue) 55%, transparent);}
+  /* the loader goes dark with everything else until the deck is powered */
+  body:not(.powered) .drawer input,
+  body:not(.powered) .drawer button{box-shadow:inset 0 2px 7px rgba(0,0,0,.85);
+    border-color:#23211c;text-shadow:none;}
+  /* BLANK is a different kind of action from LOAD: it's an empty shell, so it
+     reads as unlit metal rather than a lit signal path. */
+  #btnBlank{color:var(--champagne-mute);text-shadow:none;
+    border-color:#3a372f;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.20), 0 3px 7px rgba(0,0,0,.55);}
+  #btnBlank:hover{color:color-mix(in srgb, var(--fl-blue) 70%, #fff);
+    border-color:color-mix(in srgb, var(--fl-blue) 55%, #222);
+    text-shadow:0 0 6px color-mix(in srgb, var(--glow-blue) 55%, transparent);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.20), 0 3px 7px rgba(0,0,0,.55),
+      0 0 14px color-mix(in srgb, var(--glow-blue) 40%, transparent);}
+  .status{margin-top:10px;font-size:10.5px;letter-spacing:.2em;min-height:13px;}
+  .drawer-hide{margin-top:8px;background:none;border:none;color:var(--scale-dim);font-size:10px;
+    letter-spacing:.24em;cursor:pointer;padding:4px 0;}
+  .drawer-hide:hover{color:var(--champagne);}
+  .drawer.hidden,.status.hidden{display:none;}
+</style>
+</head>
+<body>
+<div class="deck">
+  <span class="strip top"></span><span class="strip bottom"></span>
+  <span class="strip left"></span><span class="strip right"></span>
+  <button class="pwr" id="btnPwr" title="Power">
+    <span class="pwr-ring">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+        <path d="M12 3v8"/>
+        <path d="M6.4 6.6a8 8 0 1 0 11.2 0"/>
+      </svg>
+    </span>
+    POWER
+  </button>
+  <button class="fs-tab" id="btnFS" title="Full screen (Esc or click again to exit)">&#x26F6; FULL SCREEN</button>
+  <div class="brand">
+    <span class="maker">ANO-DIGI</span>
+    <span class="dragon">XR-3000</span>
+    <span class="sub">3 HEAD · QUARTZ D.D. DUAL CAPSTAN · AUTO AZIMUTH · YOUTUBE TRANSPORT</span>
+  </div>
+  <div class="panel">
+    <div class="row">
+      <!-- Reel-to-reel cassette -->
+      <div class="bay" id="bay">
+        <span class="bay-lamp"></span>
+        <div class="cassette" id="shell">
+          <span class="moulding"></span><span class="rib-deck"></span>
+          <span class="screw s1"></span><span class="screw s2"></span><span class="screw s3"></span><span class="screw s4"></span><span class="screw s5"></span>
+          <svg class="reelSvg" viewBox="0 0 402 255.5" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="goldReel" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#ffffff"/><stop offset=".14" stop-color="#dfe5ee"/>
+                <stop offset=".28" stop-color="#9aa2ad"/><stop offset=".40" stop-color="#f2f6fb"/>
+                <stop offset=".52" stop-color="#6e757f"/><stop offset=".63" stop-color="#e8edf4"/>
+                <stop offset=".76" stop-color="#878e99"/><stop offset=".88" stop-color="#f6f9fd"/>
+                <stop offset="1" stop-color="#9aa2ad"/>
+              </linearGradient>
+              <!-- sweeping specular that rotates with the reel -->
+              <linearGradient id="reelGlint" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#fff" stop-opacity=".85"/>
+                <stop offset=".18" stop-color="#fff" stop-opacity="0"/>
+                <stop offset=".55" stop-color="#fff" stop-opacity="0"/>
+                <stop offset=".68" stop-color="#fff" stop-opacity=".55"/>
+                <stop offset=".8" stop-color="#fff" stop-opacity="0"/>
+              </linearGradient>
+              <!-- iridescent rim: the flamboyant touch -->
+              <linearGradient id="prismRim" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#ffd9f0"/><stop offset=".25" stop-color="#bfe6ff"/>
+                <stop offset=".5" stop-color="#fff6c8"/><stop offset=".75" stop-color="#c9ffe6"/>
+                <stop offset="1" stop-color="#e2d4ff"/>
+              </linearGradient>
+              <radialGradient id="hubJewel" cx=".38" cy=".32" r=".85">
+                <stop offset="0" stop-color="#ffffff"/><stop offset=".35" stop-color="#cfd5de"/>
+                <stop offset=".7" stop-color="#5f656e"/><stop offset="1" stop-color="#23262b"/>
+              </radialGradient>
+              <radialGradient id="hubChrome" cx=".4" cy=".35" r=".9">
+                <stop offset="0" stop-color="#f4f4f6"/><stop offset=".45" stop-color="#a9acb4"/>
+                <stop offset=".75" stop-color="#5c5f66"/><stop offset="1" stop-color="#2b2d33"/>
+              </radialGradient>
+              <mask id="cutL" maskUnits="userSpaceOnUse" x="32" y="42" width="144" height="144">
+                <circle cx="104" cy="114" r="70" fill="white"/>
+                <path d="M121.6 128.8 L151.5 153.9 A62 62 0 0 1 56.5 153.9 L86.4 128.8 A23 23 0 0 0 121.6 128.8 Z" fill="black"/>
+                <path d="M82.4 121.9 L45.7 135.2 A62 62 0 0 1 93.2 52.9 L100.0 91.3 A23 23 0 0 0 82.4 121.9 Z" fill="black"/>
+                <path d="M108.0 91.3 L114.8 52.9 A62 62 0 0 1 162.3 135.2 L125.6 121.9 A23 23 0 0 0 108.0 91.3 Z" fill="black"/>
+              </mask>
+              <mask id="cutR" maskUnits="userSpaceOnUse" x="226" y="42" width="144" height="144">
+                <circle cx="298" cy="114" r="70" fill="white"/>
+                <path d="M315.6 128.8 L345.5 153.9 A62 62 0 0 1 250.5 153.9 L280.4 128.8 A23 23 0 0 0 315.6 128.8 Z" fill="black"/>
+                <path d="M276.4 121.9 L239.7 135.2 A62 62 0 0 1 287.2 52.9 L294.0 91.3 A23 23 0 0 0 276.4 121.9 Z" fill="black"/>
+                <path d="M302.0 91.3 L308.8 52.9 A62 62 0 0 1 356.3 135.2 L319.6 121.9 A23 23 0 0 0 302.0 91.3 Z" fill="black"/>
+              </mask>
+            </defs>
+            <!-- ===== bottom moulded plate: head opening, pressure pad, capstan holes ===== -->
+            <path d="M58 213 L344 213 L334 249 L68 249 Z" fill="rgba(190,200,215,.10)" stroke="rgba(200,215,235,.32)" stroke-width="1.2"/>
+            <path d="M62 216 L340 216" stroke="rgba(255,255,255,.14)" stroke-width="1" fill="none"/>
+            <circle cx="201" cy="220" r="3.4" fill="#22242a" stroke="#565b64"/>
+            <path d="M199 220 L203 220 M201 218 L201 222" stroke="#0c0d10" stroke-width=".9"/>
+            <rect x="171" y="226" width="60" height="17" rx="1.5" fill="#101216" stroke="#3c3e44"/>
+            <rect x="184" y="236" width="34" height="6" rx="1" fill="#33363d" stroke="#565b64"/>
+            <path d="M191 241 Q201 234 211 241" stroke="#8a8266" stroke-width="1" fill="none"/>
+            <rect x="195" y="238" width="12" height="6" rx="2" fill="#8a5a3a"/>
+            <circle cx="150" cy="236" r="4.5" fill="#0d0e11" stroke="#565b64"/>
+            <circle cx="150" cy="236" r="1.6" fill="#22242a"/>
+            <circle cx="252" cy="236" r="4.5" fill="#0d0e11" stroke="#565b64"/>
+            <circle cx="252" cy="236" r="1.6" fill="#22242a"/>
+            <ellipse cx="110" cy="236" rx="7" ry="5" fill="#0d0e11" stroke="#565b64"/>
+            <ellipse cx="292" cy="236" rx="7" ry="5" fill="#0d0e11" stroke="#565b64"/>
+            <!-- tape ribbon -->
+            <path id="tapeShadow" d="" fill="none" stroke="#000" stroke-width="2.2" opacity=".4"/>
+            <path id="tapePath" d="" fill="none" stroke="#4a3520" stroke-width="1.3"/>
+            <path id="tapeSheen" d="" fill="none" stroke="rgba(190,160,120,.4)" stroke-width=".5"/>
+            <!-- corner guide rollers -->
+            <g stroke="#565b64">
+              <circle cx="40" cy="243" r="11" fill="#1b1d22"/>
+              <circle cx="40" cy="243" r="7" fill="#2c2f36"/>
+              <circle cx="40" cy="243" r="1.8" fill="#0c0d10" stroke="none"/>
+              <circle cx="362" cy="243" r="11" fill="#1b1d22"/>
+              <circle cx="362" cy="243" r="7" fill="#2c2f36"/>
+              <circle cx="362" cy="243" r="1.8" fill="#0c0d10" stroke="none"/>
+            </g>
+            <!-- LEFT: tape pack behind a large silver open reel -->
+            <circle cx="104" cy="114" r="23" fill="#241a10"/>
+            <circle id="packL" cx="104" cy="114" r="59" fill="none" stroke="#42301c" stroke-width="46"/>
+            <circle id="packL2" cx="104" cy="114" r="59" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="46" stroke-dasharray="1 5"/>
+            <g class="reel-rot">
+              <g mask="url(#cutL)">
+                <circle cx="104" cy="114" r="70" fill="url(#goldReel)"/>
+                <g stroke="rgba(255,255,255,.20)" stroke-width=".45"><line x1="127.9" y1="121.4" x2="162.3" y2="132.0"/><line x1="127.7" y1="122.1" x2="161.7" y2="133.7"/><line x1="127.4" y1="122.7" x2="161.2" y2="135.3"/><line x1="127.2" y1="123.4" x2="160.6" y2="136.9"/><line x1="126.9" y1="124.0" x2="159.9" y2="138.4"/><line x1="126.6" y1="124.6" x2="159.2" y2="140.0"/><line x1="126.3" y1="125.3" x2="158.4" y2="141.5"/><line x1="126.0" y1="125.9" x2="157.7" y2="143.0"/><line x1="125.7" y1="126.5" x2="156.8" y2="144.5"/><line x1="125.3" y1="127.1" x2="156.0" y2="146.0"/><line x1="124.9" y1="127.7" x2="155.0" y2="147.4"/><line x1="124.5" y1="128.3" x2="154.1" y2="148.8"/><line x1="124.1" y1="128.8" x2="153.1" y2="150.2"/><line x1="123.7" y1="129.4" x2="152.1" y2="151.6"/><line x1="123.3" y1="129.9" x2="151.0" y2="152.9"/><line x1="122.8" y1="130.5" x2="149.9" y2="154.2"/><line x1="122.3" y1="131.0" x2="148.8" y2="155.4"/><line x1="85.7" y1="131.0" x2="59.2" y2="155.4"/><line x1="85.2" y1="130.5" x2="58.1" y2="154.2"/><line x1="84.7" y1="129.9" x2="57.0" y2="152.9"/><line x1="84.3" y1="129.4" x2="55.9" y2="151.6"/><line x1="83.9" y1="128.8" x2="54.9" y2="150.2"/><line x1="83.5" y1="128.3" x2="53.9" y2="148.8"/><line x1="83.1" y1="127.7" x2="53.0" y2="147.4"/><line x1="82.7" y1="127.1" x2="52.0" y2="146.0"/><line x1="82.3" y1="126.5" x2="51.2" y2="144.5"/><line x1="82.0" y1="125.9" x2="50.3" y2="143.0"/><line x1="81.7" y1="125.3" x2="49.6" y2="141.5"/><line x1="81.4" y1="124.6" x2="48.8" y2="140.0"/><line x1="81.1" y1="124.0" x2="48.1" y2="138.4"/><line x1="80.8" y1="123.4" x2="47.4" y2="136.9"/><line x1="80.6" y1="122.7" x2="46.8" y2="135.3"/><line x1="80.3" y1="122.1" x2="46.3" y2="133.7"/><line x1="80.1" y1="121.4" x2="45.7" y2="132.0"/><line x1="98.5" y1="89.6" x2="90.5" y2="54.5"/><line x1="99.1" y1="89.5" x2="92.2" y2="54.2"/><line x1="99.8" y1="89.4" x2="93.8" y2="53.9"/><line x1="100.5" y1="89.2" x2="95.5" y2="53.6"/><line x1="101.2" y1="89.2" x2="97.2" y2="53.4"/><line x1="101.9" y1="89.1" x2="98.9" y2="53.2"/><line x1="102.6" y1="89.0" x2="100.6" y2="53.1"/><line x1="103.3" y1="89.0" x2="102.3" y2="53.0"/><line x1="104.0" y1="89.0" x2="104.0" y2="53.0"/><line x1="104.7" y1="89.0" x2="105.7" y2="53.0"/><line x1="105.4" y1="89.0" x2="107.4" y2="53.1"/><line x1="106.1" y1="89.1" x2="109.1" y2="53.2"/><line x1="106.8" y1="89.2" x2="110.8" y2="53.4"/><line x1="107.5" y1="89.2" x2="112.5" y2="53.6"/><line x1="108.2" y1="89.4" x2="114.2" y2="53.9"/><line x1="108.9" y1="89.5" x2="115.8" y2="54.2"/><line x1="109.5" y1="89.6" x2="117.5" y2="54.5"/></g>
+                <circle cx="104" cy="114" r="70" fill="url(#reelGlint)"/>
+              </g>
+              <circle cx="104" cy="114" r="70" fill="none" stroke="url(#prismRim)" stroke-width="2.2" opacity=".9"/>
+              <circle cx="104" cy="114" r="68.5" fill="none" stroke="rgba(20,24,30,.55)" stroke-width="1"/>
+              <circle cx="104" cy="114" r="62" fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".8"/>
+              <g><circle cx="161.2" cy="147.0" r="2.1" fill="url(#hubJewel)"/><circle cx="161.2" cy="147.0" r="2.1" fill="none" stroke="#7e858f" stroke-width=".6"/></g><g><circle cx="46.8" cy="147.0" r="2.1" fill="url(#hubJewel)"/><circle cx="46.8" cy="147.0" r="2.1" fill="none" stroke="#7e858f" stroke-width=".6"/></g><g><circle cx="104.0" cy="48.0" r="2.1" fill="url(#hubJewel)"/><circle cx="104.0" cy="48.0" r="2.1" fill="none" stroke="#7e858f" stroke-width=".6"/></g>
+              <circle cx="104" cy="114" r="23" fill="url(#goldReel)" stroke="url(#prismRim)" stroke-width="1.3"/>
+              <circle cx="104" cy="114" r="18.5" fill="none" stroke="rgba(255,255,255,.4)" stroke-width=".7"/>
+              <circle cx="104" cy="114" r="14" fill="url(#hubJewel)" stroke="#3c3e44" stroke-width="1.4"/>
+              <g fill="#15171b">
+                <rect x="101.1" y="102.5" width="5.8" height="6.8" rx="1.2"/>
+                <rect x="101.1" y="118.7" width="5.8" height="6.8" rx="1.2"/>
+                <rect x="92.5" y="111.1" width="6.8" height="5.8" rx="1.2"/>
+                <rect x="108.7" y="111.1" width="6.8" height="5.8" rx="1.2"/>
+              </g>
+              <circle cx="104" cy="114" r="5.4" fill="#0a0b0d"/>
+              <circle cx="102.2" cy="111.8" r="1.4" fill="rgba(255,255,255,.5)"/>
+            </g>
+            <!-- RIGHT reel -->
+            <circle cx="298" cy="114" r="23" fill="#241a10"/>
+            <circle id="packR" cx="298" cy="114" r="38" fill="none" stroke="#42301c" stroke-width="6"/>
+            <circle id="packR2" cx="298" cy="114" r="38" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="6" stroke-dasharray="1 5"/>
+            <g class="reel-rot">
+              <g mask="url(#cutR)">
+                <circle cx="298" cy="114" r="70" fill="url(#goldReel)"/>
+                <g stroke="rgba(255,255,255,.20)" stroke-width=".45"><line x1="321.9" y1="121.4" x2="356.3" y2="132.0"/><line x1="321.7" y1="122.1" x2="355.7" y2="133.7"/><line x1="321.4" y1="122.7" x2="355.2" y2="135.3"/><line x1="321.2" y1="123.4" x2="354.6" y2="136.9"/><line x1="320.9" y1="124.0" x2="353.9" y2="138.4"/><line x1="320.6" y1="124.6" x2="353.2" y2="140.0"/><line x1="320.3" y1="125.3" x2="352.4" y2="141.5"/><line x1="320.0" y1="125.9" x2="351.7" y2="143.0"/><line x1="319.7" y1="126.5" x2="350.8" y2="144.5"/><line x1="319.3" y1="127.1" x2="350.0" y2="146.0"/><line x1="318.9" y1="127.7" x2="349.0" y2="147.4"/><line x1="318.5" y1="128.3" x2="348.1" y2="148.8"/><line x1="318.1" y1="128.8" x2="347.1" y2="150.2"/><line x1="317.7" y1="129.4" x2="346.1" y2="151.6"/><line x1="317.3" y1="129.9" x2="345.0" y2="152.9"/><line x1="316.8" y1="130.5" x2="343.9" y2="154.2"/><line x1="316.3" y1="131.0" x2="342.8" y2="155.4"/><line x1="279.7" y1="131.0" x2="253.2" y2="155.4"/><line x1="279.2" y1="130.5" x2="252.1" y2="154.2"/><line x1="278.7" y1="129.9" x2="251.0" y2="152.9"/><line x1="278.3" y1="129.4" x2="249.9" y2="151.6"/><line x1="277.9" y1="128.8" x2="248.9" y2="150.2"/><line x1="277.5" y1="128.3" x2="247.9" y2="148.8"/><line x1="277.1" y1="127.7" x2="247.0" y2="147.4"/><line x1="276.7" y1="127.1" x2="246.0" y2="146.0"/><line x1="276.3" y1="126.5" x2="245.2" y2="144.5"/><line x1="276.0" y1="125.9" x2="244.3" y2="143.0"/><line x1="275.7" y1="125.3" x2="243.6" y2="141.5"/><line x1="275.4" y1="124.6" x2="242.8" y2="140.0"/><line x1="275.1" y1="124.0" x2="242.1" y2="138.4"/><line x1="274.8" y1="123.4" x2="241.4" y2="136.9"/><line x1="274.6" y1="122.7" x2="240.8" y2="135.3"/><line x1="274.3" y1="122.1" x2="240.3" y2="133.7"/><line x1="274.1" y1="121.4" x2="239.7" y2="132.0"/><line x1="292.5" y1="89.6" x2="284.5" y2="54.5"/><line x1="293.1" y1="89.5" x2="286.2" y2="54.2"/><line x1="293.8" y1="89.4" x2="287.8" y2="53.9"/><line x1="294.5" y1="89.2" x2="289.5" y2="53.6"/><line x1="295.2" y1="89.2" x2="291.2" y2="53.4"/><line x1="295.9" y1="89.1" x2="292.9" y2="53.2"/><line x1="296.6" y1="89.0" x2="294.6" y2="53.1"/><line x1="297.3" y1="89.0" x2="296.3" y2="53.0"/><line x1="298.0" y1="89.0" x2="298.0" y2="53.0"/><line x1="298.7" y1="89.0" x2="299.7" y2="53.0"/><line x1="299.4" y1="89.0" x2="301.4" y2="53.1"/><line x1="300.1" y1="89.1" x2="303.1" y2="53.2"/><line x1="300.8" y1="89.2" x2="304.8" y2="53.4"/><line x1="301.5" y1="89.2" x2="306.5" y2="53.6"/><line x1="302.2" y1="89.4" x2="308.2" y2="53.9"/><line x1="302.9" y1="89.5" x2="309.8" y2="54.2"/><line x1="303.5" y1="89.6" x2="311.5" y2="54.5"/></g>
+                <circle cx="298" cy="114" r="70" fill="url(#reelGlint)"/>
+              </g>
+              <circle cx="298" cy="114" r="70" fill="none" stroke="url(#prismRim)" stroke-width="2.2" opacity=".9"/>
+              <circle cx="298" cy="114" r="68.5" fill="none" stroke="rgba(20,24,30,.55)" stroke-width="1"/>
+              <circle cx="298" cy="114" r="62" fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".8"/>
+              <g><circle cx="355.2" cy="147.0" r="2.1" fill="url(#hubJewel)"/><circle cx="355.2" cy="147.0" r="2.1" fill="none" stroke="#7e858f" stroke-width=".6"/></g><g><circle cx="240.8" cy="147.0" r="2.1" fill="url(#hubJewel)"/><circle cx="240.8" cy="147.0" r="2.1" fill="none" stroke="#7e858f" stroke-width=".6"/></g><g><circle cx="298.0" cy="48.0" r="2.1" fill="url(#hubJewel)"/><circle cx="298.0" cy="48.0" r="2.1" fill="none" stroke="#7e858f" stroke-width=".6"/></g>
+              <circle cx="298" cy="114" r="23" fill="url(#goldReel)" stroke="url(#prismRim)" stroke-width="1.3"/>
+              <circle cx="298" cy="114" r="18.5" fill="none" stroke="rgba(255,255,255,.4)" stroke-width=".7"/>
+              <circle cx="298" cy="114" r="14" fill="url(#hubJewel)" stroke="#3c3e44" stroke-width="1.4"/>
+              <g fill="#15171b">
+                <rect x="295.1" y="102.5" width="5.8" height="6.8" rx="1.2"/>
+                <rect x="295.1" y="118.7" width="5.8" height="6.8" rx="1.2"/>
+                <rect x="286.5" y="111.1" width="6.8" height="5.8" rx="1.2"/>
+                <rect x="302.7" y="111.1" width="6.8" height="5.8" rx="1.2"/>
+              </g>
+              <circle cx="298" cy="114" r="5.4" fill="#0a0b0d"/>
+              <circle cx="296.2" cy="111.8" r="1.4" fill="rgba(255,255,255,.5)"/>
+            </g>
+            <text x="201" y="24" text-anchor="middle" font-family="Arial" font-weight="900" font-style="italic"
+              font-size="12" letter-spacing="1" fill="rgba(225,232,240,.7)">MA-X 50 &#183; METAL POSITION</text>
+          </svg>
+          <div class="song-band" id="labelSong"></div>
+          <span class="side-mark" id="sideMark">A</span>
+          <span class="metal-mark">TYPE IV · 70&#181;s EQ</span>
+        </div>
+        <div class="door">
+          <span class="door-text">3 HEAD SYSTEM</span>
+          <span class="door-hinge h1"></span><span class="door-hinge h2"></span>
+        </div>
+      </div>
+
+      <!-- FL meters + info + monitor -->
+      <div class="right-col">
+        <div class="glass fl-panel">
+          <div class="scale"><span>-40</span><span>-30</span><span>-20</span><span>-10</span><span>-5</span><span>-3</span><span>0</span><span class="red">+3</span><span class="red">+6</span></div>
+          <div class="bar-row"><span class="ch">L</span><div class="bar" id="barL"></div></div>
+          <div class="bar-row"><span class="ch">R</span><div class="bar" id="barR"></div></div>
+        </div>
+        <div class="glass info-panel">
+          <div class="info-row"><span class="k">SONG</span><span class="v" id="infoSong">—</span></div>
+          <div class="info-row"><span class="k">ARTIST</span><span class="v grn" id="infoArtist">—</span></div>
+          <div class="info-row"><span class="k">ALBUM/LIST</span><span class="v" id="infoAlbum">—</span></div>
+          <div class="info-row"><span class="k">PROGRAM</span><span class="v grn" id="infoTrack">— / —</span></div>
+          <div class="info-foot">
+            <span class="digits" id="counter">000:00</span>
+            <span class="digits" id="duration" style="font-size:12px;color:var(--scale-dim);text-shadow:none">/ 000:00</span>
+            <span class="dir"><span id="dirRev">&#9664;</span><span id="dirFwd" class="lit">&#9654;</span></span>
+            <span class="naac" id="naac">N.A.A.C.</span>
+          </div>
+        </div>
+        <div class="monitor min" id="monitor">
+          <button class="mon-toggle" id="monToggle">VIDEO &#9662;</button>
+          <div class="frame"><div id="ytplayer"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="switch"><div class="toggle" data-sw="dolbyB"><div class="knob"></div></div><div class="lamp"></div><div class="cap">DOLBY NR<br>B</div></div>
+      <div class="switch"><div class="toggle" data-sw="dolbyC"><div class="knob"></div></div><div class="lamp"></div><div class="cap">DOLBY NR<br>C</div></div>
+      <div class="switch"><div class="toggle" data-sw="mpx"><div class="knob"></div></div><div class="lamp"></div><div class="cap">MPX<br>FILTER</div></div>
+      <div class="switch"><div class="toggle on" data-sw="naacSw"><div class="knob"></div></div><div class="lamp"></div><div class="cap">AUTO<br>AZIMUTH</div></div>
+      <div class="switch"><div class="toggle on" data-sw="rev"><div class="knob"></div></div><div class="lamp"></div><div class="cap">AUTO<br>REVERSE</div></div>
+      <div class="switch"><div class="toggle" data-sw="direct"><div class="knob"></div></div><div class="lamp"></div><div class="cap">DIRECT<br>ACCESS</div></div>
+      <div class="switch tape-select">
+        <div class="tape-types">
+          <button class="ttype" data-tape="I">I</button>
+          <button class="ttype" data-tape="II">II</button>
+          <button class="ttype active" data-tape="IV">IV</button>
+        </div>
+        <div class="cap">TAPE TYPE<br><span id="tapeVal">METAL</span></div>
+      </div>
+      <div class="switch"><div class="toggle on" data-sw="preset"><div class="knob"></div></div><div class="lamp"></div><div class="cap">PRE-SET<br>&nbsp;</div></div>
+      <div class="switch disp-select">
+        <div class="disp-dots">
+          <button class="dot active" data-c="blue" style="--c:#3af2ff" title="Blue display"></button>
+          <button class="dot" data-c="green" style="--c:#00ff9b" title="Green display"></button>
+          <button class="dot" data-c="orange" style="--c:#ff8c00" title="Orange display"></button>
+          <button class="dot" data-c="red" style="--c:#ff2d18" title="Red display"></button>
+          <button class="dot" data-c="purple" style="--c:#a929ff" title="Purple display"></button>
+        </div>
+        <div class="cap">DISPLAY<br>COLOUR</div>
+      </div>
+      <div class="slider-group">
+        <input type="range" min="50" max="150" value="100" id="pitch" aria-label="Pitch control">
+        <div class="cap">PITCH CONTROL<br><span id="pitchVal">&#177;0%</span></div>
+      </div>
+      <div class="slider-group">
+        <input type="range" min="-5" max="5" value="0" id="biasFine" aria-label="Bias fine adjust">
+        <div class="cap">BIAS FINE<br><span id="biasVal">0</span></div>
+      </div>
+      <div class="slider-group">
+        <input type="range" min="-5" max="5" value="0" id="recCal" aria-label="Record calibration">
+        <div class="cap">REC CAL<br><span id="calVal">0</span></div>
+      </div>
+      <div class="slider-group output">
+        <input type="range" min="0" max="100" value="100" id="outLevel" aria-label="Output level">
+        <div class="cap">OUTPUT LEVEL<br><span id="outVal">100</span></div>
+      </div>
+    </div>
+    <div class="transport"><span class="led seq"></span><span class="led seq"></span></span>
+      <button class="tbtn" id="btnRew">&#9664;&#9664;<small>REW</small></button>
+      <button class="tbtn" id="btnPlay">&#9654;<small>PLAY</small></button>
+      <button class="tbtn" id="btnFF">&#9654;&#9654;<small>F.FWD</small></button>
+      <button class="tbtn" id="btnStop">&#9632;<small>STOP</small></button>
+      <button class="tbtn" id="btnPause">&#10074;&#10074;<small>PAUSE</small></button>
+      <button class="tbtn" id="btnPrev">&#10074;&#9664;<small>PREV TRK</small></button>
+      <button class="tbtn" id="btnNext">&#9654;&#10074;<small>NEXT TRK</small></button>
+      <button class="tbtn" id="btnMemo">M<small>MEMORY</small></button>
+      <button class="tbtn" id="btnScan">&#9654;&#8230;<small>INTRO SCAN</small></button>
+      <button class="tbtn rec" id="btnRec">&#9679;<small>RECORD</small></button>
+      <button class="tbtn" id="btnEject">&#9167;<small>EJECT</small></button><span class="led seq"></span><span class="led seq"></span></span>
+    </div>
+
+    <div class="drawer" id="drawer">
+      <input id="urlIn" placeholder="INSERT CASSETTE — YouTube / YT Music video, album or playlist link" spellcheck="false">
+      <button id="btnLoad">LOAD</button>
+      <button id="btnBlank" title="Load a blank C60 cassette — no music, but the transport runs">BLANK C60</button>
+      <button id="btnClear" title="Clear the link">CLEAR</button>
+    </div>
+    <div class="rack" id="rack">
+      <div class="rack-head">
+        <span class="rack-title">TAPE LIBRARY</span>
+        <span class="rack-count" id="rackCount">0 CASSETTES</span>
+      </div>
+      <div class="rack-shelf" id="rackShelf">
+        <span class="rack-empty">NO RECORDINGS YET &#183; PRESS RECORD WHILE A TAPE PLAYS</span>
+      </div>
+    </div>
+    <div class="status" id="status">STANDBY · INSERT CASSETTE</div>
+    <button class="drawer-hide" id="btnDrawer">&#9650; HIDE LOADER</button>
+  </div>
+</div>
+
+<script>
+/* ---------- FL bar meters ---------- */
+const SEGS=28, HOT_FROM=22, MID_FROM=16;
+function buildBar(el){const segs=[];for(let i=0;i<SEGS;i++){const s=document.createElement("div");s.className="seg";el.appendChild(s);segs.push(s);}return{segs,peak:0,peakHold:0};}
+const barL=buildBar(document.getElementById("barL"));
+const barR=buildBar(document.getElementById("barR"));
+let levelL=0,levelR=0,targetL=0,targetR=0,energy=.5;
+function paint(bar,lvl){
+  const lit=Math.round(lvl*SEGS);
+  if(lit>=bar.peak){bar.peak=lit;bar.peakHold=40;}else if(--bar.peakHold<=0&&bar.peak>0)bar.peak--;
+  bar.segs.forEach((s,i)=>{s.className="seg"+(i<lit?(" on"+(i>=HOT_FROM?" hot":i>=MID_FROM?" mid":"")):"");
+    if(i===bar.peak-1&&bar.peak>lit)s.classList.add("peak");});
+}
+function animate(){
+  if(bootSweep){targetL=targetR=1;levelL+= (1-levelL)*.25;levelR+=(1-levelR)*.22;paint(barL,levelL);paint(barR,levelR);
+    requestAnimationFrame(animate);return;}
+  const playing=state==="play"||state==="rec",shuttle=state==="ff"||state==="rw";
+  if(playing){energy+=(Math.random()-.5)*.3;energy=Math.max(.25,Math.min(1,energy));
+    if(Math.random()<.3){targetL=Math.random()*energy;targetR=Math.max(0,Math.min(1,targetL+(Math.random()-.5)*.25));}}
+  else if(shuttle){targetL=targetR=.1+Math.random()*.06;}
+  else{targetL=targetR=0;}
+  levelL+=(targetL-levelL)*(targetL>levelL?.5:.14);
+  levelR+=(targetR-levelR)*(targetR>levelR?.5:.14);
+  /* REC CAL trims meter calibration, as on a real deck: it moves the needles,
+     not the signal. Wind it up and the tape reads hot. */
+  const cal=(typeof calTrim==="function")?calTrim():1;
+  paint(barL,levelL*cal);paint(barR,levelR*cal);
+  tapeFrame();
+  requestAnimationFrame(animate);
+}
+
+/* ---------- continuous tape motion ----------
+   The counter only reports once a second, so instead of snapping the packs to
+   each reading we advance them every frame at the rate the transport is really
+   running (1x play, ~12x shuttle) and gently correct toward the true position
+   whenever a fresh reading lands. The tape visibly creeps spool to spool. */
+/* ---------- continuous tape motion ----------
+   True C60 geometry at 4 px/mm: 22mm hub, full pack winds inside the reel flange.
+   These must be declared before the animation loop, which reads them every frame. */
+const HUB_R=23, PACK_MIN=26, PACK_MAX=61;
+let tapeProg=0, tapeTarget=0, lastFrame=performance.now();
+const SHUTTLE_RATE=12;
+function setTapeTarget(p){tapeTarget=Math.max(0,Math.min(1,p));}
+function tapeFrame(){
+  const now=performance.now(), dt=Math.min(.25,(now-lastFrame)/1000); lastFrame=now;
+  /* A blank has no player, so it runs its own clock. Tick it first, then read
+     position back through the same path the video path uses. */
+  if(blank){
+    blankTick();
+    const span=blank.len||1800;
+    setTapeTarget(blank.pos/span);
+    /* the 1s tick is far too coarse for a 12x wind, so the counter is driven
+       from the frame loop while a blank is in the deck */
+    if(!recRolling){
+      const c=$("counter");
+      const s=fmt(blank.pos);
+      if(c.textContent!==s)c.textContent=s;
+    }
+  }
+  let dur=0, span=240;
+  try{
+    dur=tapeDuration();
+    span=blank?blank.len:(sideSpan()||dur||240);
+  }catch(e){ span=dur||240; }        /* first frames can precede full init */
+  /* Rate the tape is really travelling, in fractions of a side per second.
+     tapeProg always runs 0 -> 1 through whichever side is playing; setPacks()
+     maps that onto the correct supply/take-up reel, so the side flip must NOT
+     be applied twice here.
+
+     During a WIND the player is genuinely seeking, and shuttleTick() feeds us
+     its true position each hop. That reading is authoritative — estimating a
+     shuttle speed here as well would fight it and stall the reels. So we chase
+     the target hard while winding, and free-run only during PLAY, where the
+     counter is coarse (1s) and the frames have to fill the gaps. */
+  let rate=0;
+  if(state==="play"||state==="rec")rate=1/span;
+  const winding=(state==="ff"||state==="rw");
+  const running=winding||rate!==0;
+  if(blank){
+    /* blankTick() already advanced the true position this frame; just follow it,
+       or the frame estimate would double-count and run the tape at 2x. */
+    tapeProg+=(tapeTarget-tapeProg)*(running?.35:.25);
+  }else if(winding){
+    tapeProg+=(tapeTarget-tapeProg)*.35;      /* follow the real seek position */
+  }else if(rate){
+    tapeProg+=rate*dt;
+    /* The counter only reports once a second. Between readings the frame rate
+       owns the motion; the reading is used to correct accumulated drift, not to
+       anchor the tape (which would stall it against a stale value). */
+    tapeTarget=Math.max(0,Math.min(1,tapeTarget+rate*dt));
+    const drift=tapeTarget-tapeProg;
+    if(Math.abs(drift)>.002)tapeProg+=drift*.08;
+  }else{
+    tapeProg+=(tapeTarget-tapeProg)*.25;      /* parked: settle onto the true spot */
+  }
+  tapeProg=Math.max(0,Math.min(1,tapeProg));
+  setPacks(tapeProg);
+  /* Real reels speed up as their pack shrinks: the take-up hub spins fastest
+     when it's nearly empty. Feed the current take-up radius back into the rate. */
+  if(running){
+    const takeUp=(side==="B")?packRadius(1-tapeProg):packRadius(tapeProg);
+    const base=(state==="ff"||state==="rw")?.5:2.4;
+    const spin=base*(takeUp/PACK_MAX);   /* smaller pack -> shorter period -> faster */
+    shell.style.setProperty("--spin",Math.max(.18,spin).toFixed(2)+"s");
+  }
+}
+function packRadius(fill){return PACK_MIN+(PACK_MAX-PACK_MIN)*Math.max(0,Math.min(1,fill));}
+/* total seconds of programme on the current side, so wind speed is honest */
+function sideSpan(){
+  if(!player||!player.getPlaylist)return 0;
+  const pl=player.getPlaylist&&player.getPlaylist();
+  const d=player.getDuration&&player.getDuration()||0;
+  if(!pl||!pl.length)return d;
+  if(typeof estWith!=="function")return d;
+  const idx=player.getPlaylistIndex(), half=Math.ceil(pl.length/2);
+  const inB=idx>=half;
+  const ids=inB?pl.slice(half):pl.slice(0,half);
+  return estWith(ids).reduce((a,b)=>a+b,0)||d;
+}
+requestAnimationFrame(animate);
+
+/* ---------- YouTube ---------- */
+let player=null,ready=false,state="stop",seekTimer=null,side="A";
+let powered=false,bootSweep=false;
+const $=id=>document.getElementById(id);
+const shell=$("shell");
+function setStatus(t){$("status").textContent=t;}
+function parseYT(url){
+  try{
+    const u=new URL(url.trim());
+    const list=u.searchParams.get("list");
+    let v=u.searchParams.get("v");
+    if(!v&&u.hostname.includes("youtu.be"))v=u.pathname.slice(1).split("/")[0];
+    if(!v&&u.pathname.startsWith("/shorts/"))v=u.pathname.split("/")[2];
+    if(!v&&u.pathname.startsWith("/embed/"))v=u.pathname.split("/")[2];
+    return{v,list};
+  }catch(e){
+    if(/^[\w-]{11}$/.test(url.trim()))return{v:url.trim(),list:null};
+    return{v:null,list:null};
+  }
+}
+if(location.protocol==="file:"){
+  /* Opened by double-clicking the file. YouTube refuses to embed from file://
+     (error 153) and the browser blocks localStorage, so the deck cannot play
+     or save. This needs saying loudly, not hidden in the status line. */
+  setStatus("\u26A0 OPENED FROM DISK \u00B7 YOUTUBE AND SAVING ARE BLOCKED");
+  window.addEventListener("DOMContentLoaded",()=>{
+    const w=document.createElement("div");
+    w.className="disk-warn";
+    w.innerHTML='<strong>&#9888; This deck is opened from your hard drive</strong>'+
+      '<span>YouTube blocks playback from <code>file://</code> (error 153), and the browser '+
+      "won't let the Tape Library save. Nothing here will work properly this way.</span>"+
+      '<span>Put it online (GitHub Pages, Netlify) or serve it locally, then open it '+
+      'over <code>http://</code> and everything works.</span>'+
+      '<button type="button">Dismiss</button>';
+    w.querySelector("button").onclick=()=>w.remove();
+    document.body.appendChild(w);
+  });
+}
+const tag=document.createElement("script");
+tag.src="https://www.youtube.com/iframe_api";
+document.head.appendChild(tag);
+window.onYouTubeIframeAPIReady=function(){
+  player=new YT.Player("ytplayer",{
+    playerVars:{playsinline:1,controls:0,rel:0},
+    events:{
+      onReady:()=>{ready=true;player.unMute();player.setVolume(parseInt($("outLevel").value,10));setStatus("STANDBY · INSERT CASSETTE");},
+      onStateChange:(e)=>{
+        if(e.data===YT.PlayerState.PLAYING&&state!=="ff"&&state!=="rw")setMode("play");
+        else if(e.data===YT.PlayerState.PAUSED&&state==="play")setMode("pause");
+        else if(e.data===YT.PlayerState.ENDED){
+          /* AUTO REVERSE: at the end of the tape the deck turns it over and
+             keeps running, rather than simply stopping. */
+          const pl=player.getPlaylist&&player.getPlaylist();
+          const lastTrack=!pl||!pl.length||player.getPlaylistIndex()>=pl.length-1;
+          if(swOn("rev")&&lastTrack&&side==="A"){
+            flipTape("B");
+            tapeProg=0;setTapeTarget(0);   /* side B starts at its own beginning */
+            setTimeout(()=>{
+              player.seekTo(0);player.playVideo();
+              if(pl&&pl.length)player.playVideoAt(0);
+              setMode(recRolling?"rec":"play","AUTO REVERSE \u25C0\u25B6 \u00B7 SIDE B");
+            },460);
+          }else{
+            if(recRolling)stopRecord();
+            setMode("stop","END OF PROGRAM");
+          }
+        }
+        refreshInfo();
+      },
+      onError:()=>setStatus("\u26A0 THIS TAPE CANNOT BE PLAYED HERE (PRIVATE OR EMBED-BLOCKED)")
+    }
+  });
+};
+function splitTitle(title,author){
+  const seps=[" - "," \u2013 "," \u2014 "," | "];
+  for(const s of seps){
+    const i=title.indexOf(s);
+    if(i>0)return{artist:title.slice(0,i).trim(),song:title.slice(i+s.length).trim()};
+  }
+  return{artist:(author||"").replace(/ - Topic$/,""),song:title};
+}
+function flipTape(toSide){
+  const c=document.querySelector(".cassette");
+  c.classList.add("flipping");
+  setTimeout(()=>{
+    side=toSide;
+    $("sideMark").textContent=side;
+    shell.classList.toggle("sideB",side==="B");
+    c.classList.remove("flipping");
+    setStatus("AUTO REVERSE \u25C0\u25B6 · NOW PLAYING SIDE "+side);
+    naacFlash();
+  },420);
+}
+function refreshInfo(){
+  if(!player||!player.getVideoData)return;
+  const d=player.getVideoData()||{};
+  if(d.title){
+    const {artist,song}=splitTitle(d.title,d.author);
+    $("infoSong").textContent=song.toUpperCase();
+    $("infoArtist").textContent=(artist||"\u2014").toUpperCase();
+    $("labelSong").textContent=(artist?artist+" \u00B7 ":"")+song;
+    document.title="\u25B6 "+song+" \u00B7 XR-3000";
+  }
+  const pl=player.getPlaylist&&player.getPlaylist();
+  if(pl&&pl.length){
+    const idx=player.getPlaylistIndex();
+    $("infoTrack").textContent=(idx+1)+" / "+pl.length;
+    const wantSide=(pl.length>1&&idx>=Math.ceil(pl.length/2))?"B":"A";
+    const rev=document.querySelector('[data-sw="rev"]').classList.contains("on");
+    if(rev&&wantSide!==side)flipTape(wantSide);
+    const half=Math.ceil(pl.length/2);
+    $("infoAlbum").textContent="PLAYLIST \u00B7 "+pl.length+" SONGS \u00B7 SIDE "+side+
+      (side==="A"?" ("+half+")":" ("+(pl.length-half)+")");
+  }else{
+    $("infoTrack").textContent="1 / 1";
+    $("infoAlbum").textContent="SINGLE \u00B7 SIDE "+side;
+  }
+}
+function naacFlash(){const n=$("naac");if(!document.querySelector('[data-sw="naacSw"]').classList.contains("on"))return;
+  n.classList.remove("lit");void n.offsetWidth;n.classList.add("lit");setTimeout(()=>n.classList.remove("lit"),4800);}
+function setMode(m,msg){
+  if(blank&&state!==m)blankLast=performance.now();   /* don't bank time across a stop */
+  state=m;
+  shell.classList.toggle("playing",m==="play"||m==="rec"||m==="ff"||m==="rw");
+  shell.classList.toggle("ff",m==="ff");shell.classList.toggle("rw",m==="rw");
+  ["btnPlay","btnFF","btnRew","btnPause"].forEach(id=>$(id).classList.remove("engaged"));
+  if(m==="play"||m==="rec"){$("btnPlay").classList.add("engaged");naacFlash();}
+  if(typeof updateTapeAudio==="function")updateTapeAudio();
+  if(m==="ff")$("btnFF").classList.add("engaged");
+  if(m==="rw")$("btnRew").classList.add("engaged");
+  if(m==="pause")$("btnPause").classList.add("engaged");
+  document.body.classList.toggle("running",m==="play"||m==="rec"||m==="ff"||m==="rw");
+  const revTravel=(m==="rw")!==(side==="B");
+  $("dirFwd").classList.toggle("lit",!revTravel);
+  $("dirRev").classList.toggle("lit",revTravel);
+  clearInterval(seekTimer);
+  if(blank)seekTimer=null;   /* blankTick() winds the blank; no player to seek */
+  else if(m==="ff")seekTimer=setInterval(()=>{
+    const d=player.getDuration()||0;
+    if(!d){setMode("stop","NO CASSETTE \u00B7 INSERT A TAPE FIRST");return;}
+    const t=player.getCurrentTime()||0;
+    if(t>=d-1.5){setMode("stop","END OF TAPE");return;}   /* wound to the end */
+    const target=Math.min(d-1,t+12);
+    player.seekTo(target,true);shuttleTick(target,d);
+  },150);
+  if(!blank&&m==="rw")seekTimer=setInterval(()=>{
+    let target=Math.max(0,(player.getCurrentTime()||0)-12);
+    if(memoryPoint!==null&&target<=memoryPoint&&player.getCurrentTime()>memoryPoint){
+      player.seekTo(memoryPoint,true);setMode("play","MEMORY STOP \u00B7 "+fmt(memoryPoint));return;
+    }
+    player.seekTo(target,true);shuttleTick(target,player.getDuration()||0);
+  },150);
+  setStatus(msg||({play:"PLAY \u25B6 \u00B7 TAPE RUNNING",rec:"\u25CF RECORD \u00B7 TAPE RUNNING",
+    pause:"PAUSE",ff:"FAST FORWARD",rw:"REWIND",stop:"STOP"}[m]||"STANDBY"));
+}
+function fmt(s){s=Math.max(0,Math.floor(s));return String(Math.floor(s/60)).padStart(3,"0")+":"+String(s%60).padStart(2,"0");}
+
+/* ---- duration learning ---- */
+let durs={};
+try{durs=JSON.parse(localStorage.getItem("xr3000-durs")||"{}");}catch(e){durs={};}
+function saveDurs(){try{localStorage.setItem("xr3000-durs",JSON.stringify(durs));}catch(e){}}
+function learnDuration(){
+  if(!player||!player.getVideoData)return;
+  const d=player.getDuration&&player.getDuration();
+  const vd=player.getVideoData()||{};
+  if(d&&d>0&&vd.video_id&&durs[vd.video_id]!==Math.round(d)){
+    durs[vd.video_id]=Math.round(d);saveDurs();
+  }
+}
+function estWith(ids){
+  const known=ids.map(id=>durs[id]).filter(Boolean);
+  const avg=known.length?known.reduce((a,b)=>a+b,0)/known.length:240;
+  return ids.map(id=>durs[id]||avg);
+}
+function timeProgress(t,d){
+  const pl=player.getPlaylist&&player.getPlaylist();
+  if(!pl||!pl.length)return d?t/d:0;
+  const idx=player.getPlaylistIndex(), half=Math.ceil(pl.length/2);
+  const inB=idx>=half;
+  const sideIds=inB?pl.slice(half):pl.slice(0,half);
+  const sideIdx=inB?(idx-half):idx;
+  const lens=estWith(sideIds);
+  const total=lens.reduce((a,b)=>a+b,0);
+  if(!total)return 0;
+  const before=lens.slice(0,sideIdx).reduce((a,b)=>a+b,0);
+  return (before+Math.min(t,lens[sideIdx]||t))/total;
+}
+/* Reel-to-reel tape packs: supply reel shrinks, take-up grows with progress */
+/* True C60 geometry at 4 px/mm: 22mm hub (r=44px), full pack 47mm dia (r=94px), 16um tape */
+/* HUB_R / PACK_MIN / PACK_MAX are hoisted above the animation loop (see top) */
+function setPacks(prog){
+  const p=Math.max(0,Math.min(1,prog));
+  const left=side==="B"?p:(1-p), right=1-left;
+  const rL=PACK_MIN+(PACK_MAX-PACK_MIN)*left;
+  const rR=PACK_MIN+(PACK_MAX-PACK_MIN)*right;
+  const L=document.getElementById("packL"),R=document.getElementById("packR");
+  L.setAttribute("r",(rL+HUB_R)/2);L.setAttribute("stroke-width",Math.max(3,rL-HUB_R));
+  R.setAttribute("r",(rR+HUB_R)/2);R.setAttribute("stroke-width",Math.max(3,rR-HUB_R));
+  const L2=document.getElementById("packL2"),R2=document.getElementById("packR2");
+  if(L2){L2.setAttribute("r",(rL+HUB_R)/2);L2.setAttribute("stroke-width",Math.max(3,rL-HUB_R));}
+  if(R2){R2.setAttribute("r",(rR+HUB_R)/2);R2.setAttribute("stroke-width",Math.max(3,rR-HUB_R));}
+  /* Threading: outboard tangents off each pack, down to the small corner
+     guide rollers, along the bottom over capstans, pressure pad and head. */
+  const CL={x:104,y:114}, CR={x:298,y:114};
+  const GL={x:40,y:243}, GR={x:362,y:243};
+  function tangentPoint(C,r,G,outboardLeft){
+    const dx=G.x-C.x, dy=G.y-C.y, dist=Math.hypot(dx,dy);
+    const a=Math.acos(Math.min(1,r/dist));
+    const base=Math.atan2(dy,dx);
+    const t1={x:C.x+r*Math.cos(base+a), y:C.y+r*Math.sin(base+a)};
+    const t2={x:C.x+r*Math.cos(base-a), y:C.y+r*Math.sin(base-a)};
+    return outboardLeft ? (t1.x<t2.x?t1:t2) : (t1.x>t2.x?t1:t2);
+  }
+  const RD=70; /* tape leaves the reel flange, not the pack */
+  const TL=tangentPoint(CL,RD,{x:GL.x-4,y:GL.y-5},true);
+  const TR=tangentPoint(CR,RD,{x:GR.x+4,y:GR.y-5},false);
+  const d="M"+TL.x.toFixed(1)+" "+TL.y.toFixed(1)+
+    " L"+(GL.x-7)+" "+(GL.y-3)+
+    " Q"+(GL.x-8)+" "+(GL.y+7.5)+" "+(GL.x+6)+" "+(GL.y+8)+
+    " L150 250 L192 250 L201 253 L210 250 L252 250"+
+    " L"+(GR.x-6)+" "+(GR.y+8)+
+    " Q"+(GR.x+8)+" "+(GR.y+7.5)+" "+(GR.x+7)+" "+(GR.y-3)+
+    " L"+TR.x.toFixed(1)+" "+TR.y.toFixed(1);
+  ["tapeShadow","tapePath","tapeSheen"].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.setAttribute("d",d);
+  });
+}
+setPacks(0);
+function shuttleTick(t,d){
+  $("counter").textContent=recRolling?fmt(recElapsed()):fmt(t);
+  if(d)$("duration").textContent="/ "+fmt(d);
+  setTapeTarget(timeProgress(t,d));
+}
+function tick(light){
+  if(blank){
+    /* a blank has no player: read its own clock */
+    $("counter").textContent=recRolling?fmt(recElapsed()):fmt(blank.pos);
+    $("duration").textContent="/ "+fmt(blank.len);
+    if(recRolling)captureTick();
+    return;                       /* refreshInfo() would overwrite the blank's labels */
+  }
+  if(player&&player.getCurrentTime){
+    const t=player.getCurrentTime()||0,d=player.getDuration()||0;
+    $("counter").textContent=fmt(t);
+    $("duration").textContent="/ "+fmt(d);
+    /* TIME-CALIBRATED tape: the deck learns each track's true duration the
+       first time it plays, then weights the reels by real minutes. Learned
+       lengths persist in the browser between sessions; unheard tracks are
+       estimated from the average of the known ones until they play. */
+    learnDuration();
+    setTapeTarget(timeProgress(t,d));
+    if(recRolling){$("counter").textContent=fmt(recElapsed());captureTick();}
+  }
+  if(!light)refreshInfo();
+}
+setInterval(tick,1000);
+
+/* ------- PRE-SET: subtle tape-mechanism ambience (much quieter than before).
+   YouTube's audio can't be processed from outside its iframe, so this is a
+   gentle layered character: faint hiss (Dolby B/C reduce it further), a soft
+   motor bed, and quiet transport clicks. Toggle off with the PRE-SET switch. */
+let AC=null,hissGain=null,motorGain=null,masterTape=null,hissHP=null,mpxNotch=null;
+function presetOn(){const t=document.querySelector('[data-sw="preset"]');return t&&t.classList.contains("on");}
+function initAudio(){
+  if(AC)return;
+  AC=new (window.AudioContext||window.webkitAudioContext)();
+  masterTape=AC.createGain();masterTape.gain.value=parseInt($("outLevel").value,10)/100;masterTape.connect(AC.destination);
+  const len=AC.sampleRate*2,buf=AC.createBuffer(1,len,AC.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
+  const src=AC.createBufferSource();src.buffer=buf;src.loop=true;
+  hissHP=AC.createBiquadFilter();hissHP.type="highpass";hissHP.frequency.value=2500;
+  /* MPX filter: the 19kHz stereo pilot notch, so switching it is audible on hiss */
+  mpxNotch=AC.createBiquadFilter();mpxNotch.type="peaking";
+  mpxNotch.frequency.value=19000;mpxNotch.Q.value=3;mpxNotch.gain.value=0;
+  hissGain=AC.createGain();hissGain.gain.value=0;
+  src.connect(hissHP);hissHP.connect(mpxNotch);mpxNotch.connect(hissGain);
+  hissGain.connect(masterTape);src.start();
+  const m=AC.createBufferSource();m.buffer=buf;m.loop=true;
+  const lp=AC.createBiquadFilter();lp.type="lowpass";lp.frequency.value=80;lp.Q.value=2;
+  motorGain=AC.createGain();motorGain.gain.value=0;
+  m.connect(lp);lp.connect(motorGain);motorGain.connect(masterTape);m.start();
+}
+/* Tape formulation: each type has a real noise floor and bias requirement.
+   Ferric hisses most and needs least bias; metal is quietest and needs most. */
+const TAPES={
+  I:{name:"FERRIC",   hiss:1.00, bias:0, eq:"120\u00B5s"},
+  II:{name:"CHROME",  hiss:0.62, bias:2, eq:"70\u00B5s"},
+  IV:{name:"METAL",   hiss:0.40, bias:4, eq:"70\u00B5s"}
+};
+let tapeType="IV";
+function swOn(n){const t=document.querySelector('[data-sw="'+n+'"]');return t&&t.classList.contains("on");}
+/* Bias mis-set doesn't just change level: under-bias makes the tape hissy and
+   thin, over-bias dulls the top. The BIAS FINE knob is scored against what the
+   loaded formulation actually wants, so a metal tape at bias 0 sounds wrong. */
+function biasError(){
+  const set=parseInt($("biasFine").value,10)||0;
+  return set-TAPES[tapeType].bias;   /* negative = under-biased */
+}
+function hissTarget(){
+  if(!presetOn()||!(state==="play"||state==="rec"))return 0;
+  let g=.006*TAPES[tapeType].hiss;
+  if(swOn("dolbyB"))g*=.35;
+  if(swOn("dolbyC"))g*=.12;
+  const err=biasError();
+  if(err<0)g*=1+Math.abs(err)*.22;   /* under-bias: noisier */
+  if(state==="rec")g*=1.5;           /* record head is live: more noise through */
+  return g;
+}
+/* Dolby rolls the hiss band down; MPX notches the 19kHz pilot region.
+   Bias tilts where the hiss sits: over-biased tape is duller, so the hiss
+   moves down with it. */
+function updateTapeAudio(){
+  if(!AC)return;
+  const t=AC.currentTime;
+  hissGain.gain.setTargetAtTime(hissTarget(),t,.2);
+  if(hissHP){
+    const err=biasError();
+    let f=2500;
+    if(swOn("dolbyB"))f=4200;
+    if(swOn("dolbyC"))f=6000;
+    f*=Math.pow(1.06,-err);           /* over-bias dulls, under-bias brightens */
+    hissHP.frequency.setTargetAtTime(Math.max(1200,Math.min(9000,f)),t,.25);
+  }
+  if(mpxNotch)mpxNotch.gain.setTargetAtTime(swOn("mpx")?-24:0,t,.2);
+  const motor=(presetOn()&&(state==="play"||state==="rec"))?.006:
+              (presetOn()&&(state==="ff"||state==="rw"))?.015:0;
+  motorGain.gain.setTargetAtTime(motor,t,.12);
+}
+function setTapeType(tt){
+  tapeType=tt;
+  document.querySelectorAll(".ttype").forEach(b=>b.classList.toggle("active",b.dataset.tape===tt));
+  $("tapeVal").textContent=TAPES[tt].name;
+  const mm=document.querySelector(".metal-mark");
+  if(mm)mm.textContent="TYPE "+tt+" \u00B7 "+TAPES[tt].eq+" EQ";
+  const err=biasError();
+  setStatus("TAPE TYPE "+tt+" \u00B7 "+TAPES[tt].name+" \u00B7 "+TAPES[tt].eq+" EQ"+
+    (err!==0?"  \u26A0 BIAS "+(err<0?"UNDER":"OVER")+" BY "+Math.abs(err):"  \u00B7 BIAS MATCHED"));
+  updateTapeAudio();savePrefs();
+}
+document.querySelectorAll(".ttype").forEach(b=>{b.onclick=()=>setTapeType(b.dataset.tape);});
+function clunk(big){
+  if(!AC||!presetOn())return;
+  const t=AC.currentTime;
+  const o=AC.createOscillator(),g=AC.createGain(),f=AC.createBiquadFilter();
+  o.type="triangle";o.frequency.setValueAtTime(big?110:180,t);
+  o.frequency.exponentialRampToValueAtTime(45,t+.05);
+  f.type="lowpass";f.frequency.value=500;
+  g.gain.setValueAtTime(big?.14:.08,t);g.gain.exponentialRampToValueAtTime(.001,t+.1);
+  o.connect(f);f.connect(g);g.connect(masterTape);o.start(t);o.stop(t+.12);
+}
+document.addEventListener("pointerdown",()=>{initAudio();if(AC&&AC.state==="suspended")AC.resume();},{capture:true});
+
+/* ---------- Controls ---------- */
+$("btnLoad").onclick=loadTape;
+$("urlIn").addEventListener("keydown",e=>{if(e.key==="Enter")loadTape();});
+function loadTape(){
+  if(needPower())return;
+  if(!ready){setStatus("MECHANISM WARMING UP\u2026");return;}
+  ejectBlank();                    /* a real cassette replaces the blank */
+  const{v,list}=parseYT($("urlIn").value);
+  player.unMute();player.setVolume(parseInt($("outLevel").value,10));
+  side="A";$("sideMark").textContent="A";shell.classList.remove("sideB");tapeProg=0;setTapeTarget(0);setPacks(0);
+  memoryPoint=null;$("btnMemo").classList.remove("engaged");stopScan();
+  doorOpen(true);setTimeout(()=>doorOpen(false),650);
+  if(list){player.loadPlaylist({list});setStatus("CASSETTE LOADED \u00B7 ALBUM/PLAYLIST");}
+  else if(v){player.loadVideoById(v);setStatus("CASSETTE LOADED");}
+  else{setStatus("\u26A0 NOT A VALID YOUTUBE / YT MUSIC LINK");return;}
+  savePrefs();
+  if(recArmed)startRecord();
+  setMode(recRolling?"rec":"play");
+}
+$("btnPlay").onclick=()=>{if(needPower())return;
+  if(blank){                           /* a blank just runs: there is nothing to play */
+    clunk(true);cancelWind();
+    if(recArmed)startRecord();
+    setMode(recRolling?"rec":"play",recRolling?null:"PLAYING BLANK · NO SIGNAL ON TAPE");
+    return;
+  }
+  if(ready){
+  clunk(true);cancelWind();player.unMute();player.playVideo();
+  if(recArmed)startRecord();          /* PLAY + REC armed = tape rolls, exactly as it should */
+  setMode(recRolling?"rec":"play");}};
+/* PAUSE during record parks the tape: the record clock holds so index marks
+   stay true to tape position, not wall-clock time. */
+let pauseAt=0;
+$("btnPause").onclick=()=>{if(needPower())return;
+  if(!blank&&!ready)return;
+  if(state==="pause"){
+    if(pauseAt)recPaused+=(Date.now()-pauseAt)/1000;
+    pauseAt=0;if(!blank)player.playVideo();setMode(recRolling?"rec":"play");
+  }else{
+    if(recRolling)pauseAt=Date.now();
+    if(!blank)player.pauseVideo();setMode("pause");
+  }};
+$("btnStop").onclick=()=>{if(needPower())return;
+  if(recRolling)stopRecord();          /* STOP lifts the record head and shelves the tape */
+  if(blank){clunk(true);cancelWind();setMode("stop");return;}
+  if(ready){
+  clunk(true);cancelWind();player.unMute();player.pauseVideo();player.seekTo(0);setMode("stop");}};
+/* A deck cannot wind an empty bay. Without a cassette getCurrentTime() is
+   always 0, so the old FF loop kept seeking to 0+12 and the counter froze at
+   12 forever. Check for actual tape before running the transport. */
+function hasTape(){
+  if(blankLoaded())return true;          /* a blank is a real cassette */
+  if(!player||!player.getVideoData)return false;
+  const d=player.getVideoData()||{};
+  return !!d.video_id;
+}
+function needTape(){
+  if(!hasTape()){setStatus("NO CASSETTE \u00B7 INSERT A TAPE FIRST");return true;}
+  return false;
+}
+$("btnFF").onclick=()=>{if(needPower()||needTape())return;
+  if(blank){setMode(state==="ff"?"play":"ff");return;}   /* blankTick() winds it */
+  if(!ready)return;
+  if(state==="ff")setMode("play");else{player.playVideo();setMode("ff");}};
+$("btnRew").onclick=()=>{if(needPower()||needTape())return;
+  if(blank){setMode(state==="rw"?"play":"rw");return;}
+  if(!ready)return;
+  if(state==="rw")setMode("play");else{player.playVideo();setMode("rw");}};
+/* Track skips: by default the deck WINDS the tape to the next program —
+   a fast shuttle to the end of the current track before the next one starts.
+   Flip DIRECT ACCESS on to disarm this and jump instantly, CD-style. */
+let windTimer=null;
+function directOn(){const t=document.querySelector('[data-sw="direct"]');return t&&t.classList.contains("on");}
+function cancelWind(){if(windTimer){clearInterval(windTimer);windTimer=null;}}
+function windSkip(forward){
+  cancelWind();
+  const d=player.getDuration()||0;
+  player.mute(); /* the tape lifts off the head during fast wind */
+  setMode(forward?"ff":"rw",(forward?"WINDING \u25B6\u25B6 NEXT PROGRAM":"WINDING \u25C0\u25C0 PREVIOUS PROGRAM"));
+  clearInterval(seekTimer);seekTimer=null;
+  const step=Math.max(8,d/6);
+  windTimer=setInterval(()=>{
+    const t=player.getCurrentTime()||0;
+    if(forward){
+      if(d&&t<d-3){const nt=Math.min(d-1,t+step);player.seekTo(nt,true);shuttleTick(nt,d);}
+      else{cancelWind();player.nextVideo();player.unMute();setMode("play","NEXT PROGRAM");naacFlash();setTimeout(()=>tick(true),350);}
+    }else{
+      if(t>3){const nt=Math.max(0,t-step);player.seekTo(nt,true);shuttleTick(nt,d);}
+      else{cancelWind();player.previousVideo();player.unMute();setMode("play","PREVIOUS PROGRAM");naacFlash();setTimeout(()=>tick(true),350);}
+    }
+  },110);
+}
+$("btnNext").onclick=()=>{if(needPower()||!ready||!player.nextVideo)return;clunk(false);
+  if(directOn()){cancelWind();player.unMute();player.nextVideo();setMode("play","NEXT PROGRAM");naacFlash();}
+  else windSkip(true);};
+$("btnPrev").onclick=()=>{if(needPower()||!ready||!player.previousVideo)return;clunk(false);
+  if(directOn()){cancelWind();player.unMute();player.previousVideo();setMode("play","PREVIOUS PROGRAM");naacFlash();}
+  else windSkip(false);};
+$("btnEject").onclick=()=>{if(needPower())return;
+  if(!blank&&!ready)return;
+  if($("bay").classList.contains("open")){ /* second press: just close the door */
+    clunk(false);doorOpen(false);setStatus("DOOR CLOSED");return;
+  }
+  const wasBlank=blankLoaded();
+  ejectBlank();
+  if(wasBlank){
+    if(recRolling)stopRecord();
+    clunk(true);setMode("stop","BLANK EJECTED \u00B7 DOOR OPEN");doorOpen(true);cancelWind();
+    memoryPoint=null;$("btnMemo").classList.remove("engaged");stopScan();
+    side="A";$("sideMark").textContent="A";shell.classList.remove("sideB");
+    tapeProg=0;setTapeTarget(0);setPacks(0);
+    $("counter").textContent="000:00";$("duration").textContent="/ 000:00";
+    return;
+  }
+  if(recRolling)stopRecord();     /* can't eject a rolling tape without shelving it first */
+  clunk(true);player.stopVideo();setMode("stop","CASSETTE EJECTED \u00b7 DOOR OPEN");doorOpen(true);cancelWind();player.unMute();memoryPoint=null;$("btnMemo").classList.remove("engaged");stopScan();
+  side="A";$("sideMark").textContent="A";shell.classList.remove("sideB");tapeProg=0;setTapeTarget(0);setPacks(0);
+  $("labelSong").textContent="";
+  ["infoSong","infoArtist","infoAlbum"].forEach(id=>$(id).textContent="\u2014");
+  $("infoTrack").textContent="\u2014 / \u2014";$("counter").textContent="000:00";$("duration").textContent="/ 000:00";};
+
+$("btnClear").onclick=()=>{$("urlIn").value="";$("urlIn").focus();};
+
+/* POWER: cold-start sequence — lamp, meter sweep, displays waking in order */
+$("btnPwr").onclick=()=>{
+  if(!powered){
+    powered=true;
+    document.body.classList.add("powered","boot");
+    setStatus("XR-3000 \u00B7 POWER ON \u00B7 SELF TEST");
+    bootSweep=true;
+    setTimeout(()=>{bootSweep=false;},700);
+    naacFlash();
+    setTimeout(()=>{document.body.classList.remove("boot");setStatus("STANDBY \u00B7 INSERT CASSETTE");},1600);
+  }else{
+    powered=false;
+    if(recRolling)stopRecord();   /* power down shelves the tape rather than losing it */
+    document.body.classList.remove("powered","boot");
+    cancelWind();stopScan();
+    if(ready){player.pauseVideo();}
+    setMode("stop","");setStatus("POWER OFF");
+  }
+};
+function needPower(){if(!powered){setStatus("PRESS POWER \u00B7 DECK IS OFF");return true;}return false;}
+
+/* full screen: hides the browser's toolbars top and bottom; Esc exits too */
+$("btnFS").onclick=()=>{
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().catch(()=>setStatus("FULL SCREEN NOT PERMITTED HERE"));
+  }else{
+    document.exitFullscreen();
+  }
+};
+document.addEventListener("fullscreenchange",()=>{
+  $("btnFS").innerHTML=document.fullscreenElement?"\u26F6 EXIT FULL SCREEN":"\u26F6 FULL SCREEN";
+});
+
+/* COUNTER MEMORY: press to store the current counter point (button stays lit);
+   REW then winds back and stops exactly there, like memory-stop on the era's decks */
+let memoryPoint=null;
+$("btnMemo").onclick=()=>{
+  if(!ready)return;
+  if(memoryPoint===null){
+    memoryPoint=player.getCurrentTime()||0;
+    $("btnMemo").classList.add("engaged");
+    setStatus("MEMORY SET \u00B7 "+fmt(memoryPoint));
+  }else{
+    memoryPoint=null;
+    $("btnMemo").classList.remove("engaged");
+    setStatus("MEMORY CLEARED");
+  }
+};
+
+/* INTRO SCAN: samples the first seconds of each following track, like Music Scan */
+let scanTimer=null;
+function stopScan(msg){
+  if(scanTimer){clearInterval(scanTimer);scanTimer=null;}
+  $("btnScan").classList.remove("engaged");
+  if(msg)setStatus(msg);
+}
+$("btnScan").onclick=()=>{
+  if(!ready)return;
+  if(scanTimer){stopScan("INTRO SCAN CANCELLED \u00B7 RESUMING");setMode("play");return;}
+  const pl=player.getPlaylist&&player.getPlaylist();
+  if(!pl||pl.length<2){setStatus("INTRO SCAN NEEDS A PLAYLIST");return;}
+  $("btnScan").classList.add("engaged");
+  player.playVideo();setMode("play","INTRO SCAN \u00B7 SAMPLING EACH PROGRAM");
+  $("btnScan").classList.add("engaged");
+  let elapsed=0;
+  scanTimer=setInterval(()=>{
+    elapsed+=1;
+    if(elapsed>=8){
+      elapsed=0;
+      const idx=player.getPlaylistIndex();
+      if(idx>=pl.length-1){stopScan("INTRO SCAN COMPLETE");return;}
+      player.nextVideo();
+      setStatus("INTRO SCAN \u00B7 PROGRAM "+(idx+2)+" / "+pl.length);
+    }
+  },1000);
+};
+
+/* BIAS FINE now reads against the loaded formulation, and drives the hiss
+   character through updateTapeAudio(). REC CAL trims the meter calibration,
+   exactly as it would on a real deck: it moves the needles, not the signal. */
+$("biasFine").oninput=e=>{
+  const v=parseInt(e.target.value,10);
+  const err=v-TAPES[tapeType].bias;
+  $("biasVal").textContent=(v>0?"+":"")+v+(err===0?" \u2713":"");
+  updateTapeAudio();savePrefs();
+};
+$("recCal").oninput=e=>{$("calVal").textContent=(e.target.value>0?"+":"")+e.target.value;savePrefs();};
+function calTrim(){return 1+((parseInt($("recCal").value,10)||0)*.08);}
+
+/* ======================= RECORD =======================
+   A browser cannot capture YouTube's audio (it lives in a cross-origin iframe
+   with no route to the Web Audio graph), so the deck cannot cut a WAV of the
+   song. What it CAN do is what a real deck's counter and index marks did:
+   log what passed the heads. Arm RECORD, and every programme that plays is
+   written to the cassette with its position and length. The result is a
+   playable tape you can name, shelve, and load again. */
+let recArmed=false, recRolling=false, recStart=0, recPaused=0, recTape=null, lastCapId=null;
+function recElapsed(){return recRolling?((Date.now()-recStart)/1000)-recPaused:0;}
+function captureTick(){
+  if(!recTape)return;
+  /* Recording a blank with no source rolls the tape but writes nothing to it —
+     there's no signal at the input. The counter still runs, as it must. */
+  if(blank)return;
+  if(!player||!player.getVideoData)return;
+  const d=player.getVideoData()||{};
+  if(!d.video_id)return;
+  if(d.video_id===lastCapId){
+    const last=recTape.tracks[recTape.tracks.length-1];
+    if(last)last.len=Math.max(last.len,Math.round(player.getCurrentTime()||0));
+    return;
+  }
+  lastCapId=d.video_id;
+  const {artist,song}=splitTitle(d.title||"UNKNOWN",d.author);
+  recTape.tracks.push({
+    id:d.video_id, song, artist,
+    at:Math.round(recElapsed()),        /* index mark: where on the tape it starts */
+    len:Math.round(player.getCurrentTime()||0)
+  });
+  setStatus("\u25CF REC \u00B7 PROGRAM "+recTape.tracks.length+" \u00B7 "+song.toUpperCase());
+  naacFlash();
+}
+$("btnRec").onclick=()=>{
+  if(needPower())return;
+  if(!blank&&!ready)return;            /* a blank has no player, but is recordable */
+  if(needTape())return;                /* nothing to record onto */
+  if(recRolling){stopRecord();return;}
+  if(recArmed){                       /* second press while armed: disarm */
+    recArmed=false;$("btnRec").classList.remove("armed");
+    setStatus("RECORD DISARMED");return;
+  }
+  recArmed=true;$("btnRec").classList.add("armed");
+  setStatus("\u25CF RECORD ARMED \u00B7 PRESS PLAY TO ROLL TAPE");
+};
+function startRecord(){
+  if(!recArmed)return;
+  recArmed=false;recRolling=true;recPaused=0;lastCapId=null;
+  recStart=Date.now();
+  /* a blank has no player behind it, so there's no playlist and no seed video */
+  const pl=(!blank&&player&&player.getPlaylist)?player.getPlaylist():null;
+  recTape={
+    id:"t"+Date.now(),
+    name:"",
+    tape:tapeType,
+    blank:blankLoaded(),
+    dolby:swOn("dolbyC")?"C":swOn("dolbyB")?"B":"OFF",
+    list:(pl&&pl.length)?pl.slice():null,
+    seed:(!blank&&player&&player.getVideoData)?((player.getVideoData()||{}).video_id||null):null,
+    tracks:[], len:0, made:Date.now()
+  };
+  $("btnRec").classList.remove("armed");$("btnRec").classList.add("rolling");
+  document.body.classList.add("recording");
+  clunk(true);
+  setStatus("\u25CF RECORDING \u00B7 "+TAPES[tapeType].name+" \u00B7 DOLBY "+recTape.dolby);
+  captureTick();updateTapeAudio();
+}
+function stopRecord(){
+  if(!recRolling)return;
+  recRolling=false;
+  $("btnRec").classList.remove("rolling","armed");
+  document.body.classList.remove("recording");
+  clunk(true);updateTapeAudio();
+  recTape.len=Math.round(recElapsed());
+  if(!recTape.tracks.length){
+    setStatus(recTape.blank
+      ? "\u25A0 BLANK RECORDED \u00B7 NO SOURCE AT INPUT \u00B7 TAPE IS STILL EMPTY"
+      : "RECORDING DISCARDED \u00B7 NOTHING PASSED THE HEADS");
+    recTape=null;return;
+  }
+  const first=recTape.tracks[0];
+  const suggested=(recTape.tracks.length>1?"MIXTAPE \u00B7 "+first.artist:first.artist+" \u00B7 "+first.song).slice(0,42);
+  const nm=prompt("Label this cassette:",suggested.toUpperCase());
+  if(nm===null){setStatus("RECORDING DISCARDED");recTape=null;return;}
+  recTape.name=(nm.trim()||suggested).toUpperCase().slice(0,42);
+  library.unshift(recTape);
+  saveLibrary();renderRack();
+  setStatus("\u25A0 TAPE SAVED \u00B7 "+recTape.name+" \u00B7 "+recTape.tracks.length+" PROGRAMS \u00B7 "+fmt(recTape.len));
+  recTape=null;
+}
+
+/* ======================= BLANK TAPE =======================
+   A real deck ships with blank cassettes: you can load one, wind it end to end,
+   flip it and record onto it — it simply makes no sound, because nothing is on
+   it yet. There's no YouTube player behind a blank, so the tape needs its own
+   clock. Everything downstream (packs, counter, reels) reads position through
+   tapeTime()/tapeDuration(), so it works identically for tape and for video. */
+const BLANK_LEN={ "C46":46*60, "C60":60*60, "C90":90*60 };
+let blank=null;          /* {len, pos, len} when a blank is loaded, else null */
+let blankLast=0;
+function blankLoaded(){return blank!==null;}
+/* the blank's own transport: advances its clock at the transport's real rate */
+/* A real deck winds a full C60 side (30 min of tape) in roughly a minute — call
+   it ~30x real time. The 12x used for video is deliberately gentler, because
+   there we're seeking a stream and want to hear where we land; a blank has
+   nothing to hear, so it winds at true mechanism speed and you watch it move. */
+const BLANK_SHUTTLE=30;
+function blankTick(){
+  if(!blank)return;
+  const now=performance.now();
+  const dt=Math.min(.5,(now-blankLast)/1000);
+  blankLast=now;
+  let v=0;
+  if(state==="play"||state==="rec")v=1;
+  else if(state==="ff")v=BLANK_SHUTTLE;
+  else if(state==="rw")v=-BLANK_SHUTTLE;
+  if(!v)return;
+  blank.pos+=v*dt;
+  /* wound to either end: the transport stops, as it must */
+  if(blank.pos>=blank.len){
+    blank.pos=blank.len;
+    if(swOn("rev")&&side==="A"){autoReverseBlank();return;}
+    setMode("stop","END OF TAPE \u00B7 SIDE "+side);
+  }else if(blank.pos<=0){
+    blank.pos=0;
+    if(state==="rw")setMode("stop","TAPE REWOUND \u00B7 SIDE "+side);
+  }
+}
+function autoReverseBlank(){
+  flipTape("B");
+  blank.pos=0;tapeProg=0;setTapeTarget(0);
+  setTimeout(()=>setMode("play","AUTO REVERSE \u25C0\u25B6 \u00B7 SIDE B"),460);
+}
+/* Unified position readers: the rest of the deck asks these, not the player. */
+function tapeTime(){
+  if(blank)return blank.pos;
+  return (player&&player.getCurrentTime&&player.getCurrentTime())||0;
+}
+function tapeDuration(){
+  if(blank)return blank.len;
+  return (player&&player.getDuration&&player.getDuration())||0;
+}
+function loadBlank(len){
+  if(needPower())return;
+  const secs=BLANK_LEN[len]||BLANK_LEN.C60;
+  /* a blank has two sides, so each side is half the shell's stated length */
+  blank={len:secs/2, pos:0, label:len};
+  blankLast=performance.now();
+  if(ready&&player.stopVideo){player.stopVideo();}
+  side="A";$("sideMark").textContent="A";shell.classList.remove("sideB");
+  tapeProg=0;setTapeTarget(0);setPacks(0);
+  memoryPoint=null;$("btnMemo").classList.remove("engaged");stopScan();
+  doorOpen(true);setTimeout(()=>doorOpen(false),650);
+  $("labelSong").textContent="";
+  $("infoSong").textContent="BLANK TAPE";
+  $("infoArtist").textContent="\u2014";
+  $("infoAlbum").textContent=len+" \u00B7 "+TAPES[tapeType].name+" \u00B7 SIDE A";
+  $("infoTrack").textContent="\u2014 / \u2014";
+  $("counter").textContent="000:00";
+  $("duration").textContent="/ "+fmt(secs/2);   /* per-side length, shown at once */
+  const mm=document.querySelector(".metal-mark");
+  if(mm)mm.textContent="TYPE "+tapeType+" \u00B7 "+TAPES[tapeType].eq+" EQ";
+  const band=document.querySelector(".band .max-badge");
+  setMode("stop","BLANK "+len+" LOADED \u00B7 "+TAPES[tapeType].name+" \u00B7 NOTHING RECORDED");
+  updateTapeAudio();
+}
+function ejectBlank(){
+  blank=null;
+  $("infoSong").textContent="\u2014";
+  $("infoAlbum").textContent="\u2014";
+}
+$("btnBlank").onclick=()=>loadBlank("C60");
+
+/* ---------- TAPE LIBRARY (persists in this browser) ---------- */
+let library=[];
+try{library=JSON.parse(localStorage.getItem("xr3000-library")||"[]");}catch(e){library=[];}
+function saveLibrary(){try{localStorage.setItem("xr3000-library",JSON.stringify(library));}catch(e){}}
+function renderRack(){
+  const shelf=$("rackShelf");
+  $("rackCount").textContent=library.length+" CASSETTE"+(library.length===1?"":"S");
+  if(!library.length){
+    shelf.innerHTML='<span class="rack-empty">NO RECORDINGS YET \u00B7 PRESS RECORD WHILE A TAPE PLAYS</span>';
+    return;
+  }
+  shelf.innerHTML="";
+  library.forEach(t=>{
+    const card=document.createElement("button");
+    card.className="tape-card";
+    card.title="Load this cassette";
+    card.innerHTML='<span class="tc-name"></span><span class="tc-meta"></span>';
+    card.querySelector(".tc-name").textContent=t.name;
+    card.querySelector(".tc-meta").textContent=
+      t.tracks.length+" PROG \u00B7 "+fmt(t.len)+" \u00B7 TYPE "+t.tape+" \u00B7 DOLBY "+t.dolby;
+    card.onclick=()=>loadFromLibrary(t.id);
+    const del=document.createElement("button");
+    del.className="tc-eject";del.innerHTML="&times;";del.title="Erase this cassette";
+    del.onclick=e=>{
+      e.stopPropagation();
+      library=library.filter(x=>x.id!==t.id);
+      saveLibrary();renderRack();setStatus("TAPE ERASED \u00B7 "+t.name);
+    };
+    card.appendChild(del);
+    shelf.appendChild(card);
+  });
+}
+function loadFromLibrary(id){
+  const t=library.find(x=>x.id===id);
+  if(!t)return;
+  if(needPower()||!ready)return;
+  ejectBlank();
+  setTapeType(t.tape);
+  document.querySelectorAll('[data-sw="dolbyB"],[data-sw="dolbyC"]').forEach(x=>x.classList.remove("on"));
+  if(t.dolby==="B")document.querySelector('[data-sw="dolbyB"]').classList.add("on");
+  if(t.dolby==="C")document.querySelector('[data-sw="dolbyC"]').classList.add("on");
+  side="A";$("sideMark").textContent="A";shell.classList.remove("sideB");
+  tapeProg=0;setTapeTarget(0);
+  doorOpen(true);setTimeout(()=>doorOpen(false),650);
+  if(t.list&&t.list.length)player.loadPlaylist({playlist:t.list});
+  else if(t.tracks.length)player.loadPlaylist({playlist:t.tracks.map(x=>x.id)});
+  else if(t.seed)player.loadVideoById(t.seed);
+  else return;
+  setMode("play","PLAYING \u00B7 "+t.name);
+  updateTapeAudio();
+}
+renderRack();
+
+/* ---------- PREFERENCES (last link, colour, switches, tape) ---------- */
+function savePrefs(){
+  try{
+    localStorage.setItem("xr3000-prefs",JSON.stringify({
+      url:$("urlIn").value,
+      colour:(document.querySelector(".dot.active")||{}).dataset?.c||"blue",
+      tape:tapeType,
+      bias:$("biasFine").value, cal:$("recCal").value,
+      out:$("outLevel").value, pitch:$("pitch").value,
+      sw:["dolbyB","dolbyC","mpx","naacSw","rev","direct","preset"]
+         .filter(n=>swOn(n))
+    }));
+  }catch(e){}
+}
+function loadPrefs(){
+  let p=null;
+  try{p=JSON.parse(localStorage.getItem("xr3000-prefs")||"null");}catch(e){}
+  if(!p)return;
+  if(p.url)$("urlIn").value=p.url;
+  if(p.colour&&p.colour!=="blue"){
+    document.querySelectorAll(".dot").forEach(x=>x.classList.toggle("active",x.dataset.c===p.colour));
+    document.body.setAttribute("data-disp",p.colour);
+  }
+  if(Array.isArray(p.sw)){
+    ["dolbyB","dolbyC","mpx","naacSw","rev","direct","preset"].forEach(n=>{
+      const t=document.querySelector('[data-sw="'+n+'"]');
+      if(!t)return;
+      /* the .toggle.on + .lamp rule lights the lamp; writing inline styles here
+         would override it with a dimmer glow, so just set the class. */
+      t.classList.toggle("on",p.sw.includes(n));
+    });
+  }
+  if(p.bias!==undefined){$("biasFine").value=p.bias;$("biasFine").dispatchEvent(new Event("input"));}
+  if(p.cal!==undefined){$("recCal").value=p.cal;$("recCal").dispatchEvent(new Event("input"));}
+  if(p.out!==undefined){$("outLevel").value=p.out;$("outVal").textContent=p.out;}
+  if(p.pitch!==undefined){$("pitch").value=p.pitch;$("pitch").dispatchEvent(new Event("input"));}
+  if(p.tape)setTapeType(p.tape); else setTapeType("IV");
+}
+loadPrefs();
+$("urlIn").addEventListener("change",savePrefs);
+
+/* ---------- KEYBOARD TRANSPORT ---------- */
+document.addEventListener("keydown",e=>{
+  if(/^(INPUT|TEXTAREA)$/.test(e.target.tagName))return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  const k=e.key.toLowerCase();
+  const hit=id=>{e.preventDefault();$(id).click();};
+  if(e.code==="Space")return hit(state==="play"?"btnPause":"btnPlay");
+  if(k==="arrowright")return hit(e.shiftKey?"btnNext":"btnFF");
+  if(k==="arrowleft") return hit(e.shiftKey?"btnPrev":"btnRew");
+  if(k==="s")return hit("btnStop");
+  if(k==="r")return hit("btnRec");
+  if(k==="e")return hit("btnEject");
+  if(k==="m")return hit("btnMemo");
+  if(k==="p")return hit("btnPwr");
+  if(k==="arrowup"||k==="arrowdown"){
+    e.preventDefault();
+    const o=$("outLevel");
+    o.value=Math.max(0,Math.min(100,(parseInt(o.value,10)||0)+(k==="arrowup"?5:-5)));
+    o.dispatchEvent(new Event("input",{bubbles:true}));
+  }
+});
+
+/* double-click any slider returns it to its centre detent, like tapping
+   a real pot back to its indent (pitch 0%, bias 0, cal 0, output 100) */
+const DETENTS={pitch:"100",biasFine:"0",recCal:"0",outLevel:"100"};
+Object.keys(DETENTS).forEach(id=>{
+  const el=$(id); if(!el)return;
+  el.addEventListener("dblclick",()=>{
+    el.value=DETENTS[id];
+    el.dispatchEvent(new Event("input",{bubbles:true}));
+  });
+});
+
+/* display colour selector */
+document.querySelectorAll(".dot").forEach(d=>{
+  d.onclick=()=>{
+    document.querySelectorAll(".dot").forEach(x=>x.classList.remove("active"));
+    d.classList.add("active");
+    const c=d.dataset.c;
+    if(c==="blue")document.body.removeAttribute("data-disp");
+    else document.body.setAttribute("data-disp",c);
+    savePrefs();
+  };
+});
+
+/* cassette door */
+function doorOpen(o){$("bay").classList.toggle("open",o);}
+$("btnDrawer").onclick=()=>{
+  const hidden=$("drawer").classList.toggle("hidden");
+  $("status").classList.toggle("hidden",hidden);
+  $("btnDrawer").innerHTML=hidden?"&#9660; SHOW LOADER":"&#9650; HIDE LOADER";
+};
+/* YouTube only honours a fixed set of playback rates. A continuous slider
+   would show a number the deck can't actually hit, so snap to what's real. */
+$("pitch").oninput=e=>{
+  const want=e.target.value/100;
+  let rates=[0.5,0.75,1,1.25,1.5];
+  if(ready&&player.getAvailablePlaybackRates){
+    const r=player.getAvailablePlaybackRates();
+    if(r&&r.length)rates=r;
+  }
+  const p=rates.reduce((a,b)=>Math.abs(b-want)<Math.abs(a-want)?b:a,rates[0]);
+  $("pitchVal").textContent=(p>=1?"+":"")+Math.round((p-1)*100)+"%";
+  if(ready&&player.setPlaybackRate)player.setPlaybackRate(p);
+  savePrefs();
+};
+$("outLevel").oninput=e=>{const v=parseInt(e.target.value,10);
+  $("outVal").textContent=v;
+  if(ready){player.unMute();player.setVolume(v);}
+  if(masterTape)masterTape.gain.setTargetAtTime(v/100,AC.currentTime,.05);
+  savePrefs();};
+$("monToggle").onclick=()=>{
+  const m=$("monitor");m.classList.toggle("min");
+  $("monToggle").innerHTML=m.classList.contains("min")?"VIDEO \u25BE":"VIDEO \u25B4";
+};
+document.querySelectorAll(".toggle").forEach(t=>{
+  t.onclick=()=>{
+    t.classList.toggle("on");
+    const sw=t.dataset.sw;
+    if(t.classList.contains("on")&&(sw==="dolbyB"||sw==="dolbyC")){
+      const o=document.querySelector(`[data-sw="${sw==="dolbyB"?"dolbyC":"dolbyB"}"]`);
+      o.classList.remove("on");
+    }
+    if(typeof updateTapeAudio==="function")updateTapeAudio();
+    if(typeof savePrefs==="function")savePrefs();
+  };
+});
+</script>
+</body>
+</html>
+
+# ANO-DIGI XR-3000
+
+A stereo cassette deck that plays YouTube.
+
+Paste in a link and the reels turn, the tape winds spool to spool, the FL meters
+move, and the counter runs. Record what plays and it's saved to the tape library
+as a cassette you can load again.
+
+**[Open the deck](https://YOURNAME.github.io/xr3000/)** ← replace `YOURNAME` once
+Pages is live
+
+---
+
+## It has to be served over http, not opened from disk
+
+This is the one thing that trips everyone up.
+
+If you **double-click `index.html`**, your browser opens it as `file://` and:
+
+- **YouTube won't play** — Google blocks embedding from local files (error 153)
+- **Nothing saves** — browsers block storage on local files, so the tape library
+  is wiped every time
+
+The deck detects this and shows a red warning. It isn't broken; it just has to be
+served properly. GitHub Pages does that for free — see below.
+
+---
+
+## Putting it online
+
+1. Create a **public** repository (Pages needs public on the free tier)
+2. Upload `index.html` to it
+3. **Settings → Pages → Source: Deploy from a branch → `main` / `(root)` → Save**
+4. Wait a minute; Pages shows your live URL. Bookmark it.
+
+That's it. YouTube plays, the library saves, and it works on your phone.
+
+### Or run it locally
+
+```bash
+python3 -m http.server 8000
+```
+
+Then open `http://localhost:8000`. Works, but only while that terminal is running.
+
+---
+
+## Using it
+
+### Play something
+
+Paste a YouTube link into the loader and press **LOAD**. Playlists and albums work
+best — the deck treats a playlist as a two-sided tape and will flip to side B
+halfway through.
+
+### Save a tape to the library
+
+The **TAPE LIBRARY** at the bottom is where saved cassettes live.
+
+1. Load and play a link
+2. Press **RECORD** — it arms (red)
+3. Press **PLAY** — the tape rolls and logs each track as it passes the heads
+4. Press **STOP** — name the tape
+5. It appears as a card. Click it any time to load it back.
+
+Tapes are stored in your browser, tied to the site's address. Because Pages gives
+you a stable URL, they persist.
+
+### Blank cassettes
+
+**BLANK C60** loads an empty cassette. There's no music on it, so nothing plays —
+it's there so the transport can run on its own. You can wind it end to end, flip
+it, and watch the reels transfer. It plays no part in saving your music.
+
+---
+
+## The controls
+
+**Transport** — REW, PLAY, F.FWD, STOP, PAUSE, PREV/NEXT TRK, MEMORY, INTRO SCAN,
+RECORD, EJECT.
+
+By default the deck **winds the tape** to reach the next track, like a real one.
+Flip **DIRECT ACCESS** on to jump instantly instead.
+
+**MEMORY** stores the current counter position; rewinding then stops exactly there.
+
+**INTRO SCAN** samples the first few seconds of each track in a playlist.
+
+**Tape type (I / II / IV)** — ferric, chrome, metal. Each has a real noise floor and
+bias requirement. Metal is the quietest and wants the most bias.
+
+**BIAS FINE** is scored against whatever tape is loaded — match it and you get a ✓.
+Under-bias and the tape gets hissy and bright; over-bias and it dulls.
+
+**DOLBY B / C** and **MPX** genuinely filter the deck's own tape hiss. They can't
+touch YouTube's audio (it's sandboxed in a cross-origin iframe), so they act where
+they honestly can.
+
+**REC CAL** trims the meter calibration, not the signal — exactly as on a real deck.
+
+**PRE-SET** toggles the tape ambience: hiss, motor bed, and transport clunks.
+
+**DISPLAY COLOUR** relights the whole deck — meters, lettering, loader, bay lamp.
+
+### Keyboard
+
+| Key | Does |
+|-----|------|
+| `Space` | Play / Pause |
+| `←` `→` | Rewind / Fast forward |
+| `Shift` + `←` `→` | Previous / Next track |
+| `↑` `↓` | Output level |
+| `S` | Stop |
+| `R` | Record |
+| `E` | Eject |
+| `M` | Memory |
+| `P` | Power |
+
+---
+
+## What it can't do
+
+**It can't record YouTube's audio to a file.** The audio lives in a cross-origin
+iframe with no route into the Web Audio graph, so no browser page can capture it.
+RECORD does what a real deck's counter and index marks did — it logs what passed
+the heads, with positions and lengths — but it can't rip the song to your drive.
+
+**Some videos won't play.** If a video is private, age-restricted, or the uploader
+has disabled embedding, YouTube refuses and the deck says so.
+
+---
+
+## How it works
+
+One self-contained HTML file. No build step, no dependencies, no bundler.
+
+The tape physics are real: the deck learns each track's true duration the first time
+it plays, weights the reels by actual minutes, and shrinks the supply pack while the
+take-up pack grows. Reel speed varies with pack radius — a nearly-empty hub spins
+fast, a full one crawls — because that's what tape does.
